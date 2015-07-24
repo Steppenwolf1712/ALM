@@ -41,31 +41,47 @@ public class WidgetFactory {
             e.printStackTrace();
         } catch (InstantiationException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         erg.addMouseListener(new PlaceHolder_Listener(targetsParent, targetLayout, id));
         return erg;
     }
 
-    private Component copyOf(Component comp) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+    private Component copyOf(Component comp) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         Component erg = null;
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(stream);
-        Class[] params = {out.getClass()};
-        Method write = comp.getClass().getDeclaredMethod("writeObject", params);
-        write.setAccessible(true);
-        write.invoke(comp, out);
+        out.writeObject(comp);
+        out.flush();
+        out.close();
 
-        byte[] streamResult = stream.toByteArray();
-        stream.flush();
+        byte[] result = stream.toByteArray();
 
-        erg = comp.getClass().newInstance();
+        ByteArrayInputStream inStream = new ByteArrayInputStream(result);
+        ObjectInputStream in = new ObjectInputStream(inStream);
 
-        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(streamResult));
-        Class[] params2 = {in.getClass()};
-        Method read = erg.getClass().getMethod("readObject", params2);
-        read.setAccessible(true);
-        read.invoke(erg, in);
+        erg = (Component)in.readObject();
+
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        ObjectOutputStream out = new ObjectOutputStream(stream);
+//        Class[] params = {out.getClass()};
+//        Method write = comp.getClass().getDeclaredMethod("writeObject", params);
+//        write.setAccessible(true);
+//        Object[] args = {out};
+//        write.invoke(comp, args);
+//
+//        byte[] streamResult = stream.toByteArray();
+//        stream.flush();
+//
+//        erg = comp.getClass().newInstance();
+//
+//        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(streamResult));
+//        Class[] params2 = {in.getClass()};
+//        Method read = erg.getClass().getMethod("readObject", params2);
+//        read.setAccessible(true);
+//        read.invoke(erg, in);
 
         return erg;
     }

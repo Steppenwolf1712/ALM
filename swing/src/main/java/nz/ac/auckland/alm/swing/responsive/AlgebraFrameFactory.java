@@ -62,6 +62,7 @@ public class AlgebraFrameFactory {
             layout.addResponsivePart(part);
         }
 
+        erg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         erg.setLayout(layout);
         erg.setSize(new Dimension(500, 500));
         erg.doLayout();
