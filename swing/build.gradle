@@ -15,3 +15,10 @@ task runSwingTests(type: JavaExec) {
     classpath sourceSets.test.runtimeClasspath
     main = "nz.ac.auckland.alm.swing.test.SwingTests"
 }
+
+task runResponsiveGUIEditorTests(type: JavaExec) {
+    classpath sourceSets.test.runtimeClasspath
+    main = "nz.ac.auckland.alm.swing.test.responsive.ResponsiveGUIEditorTest"
+}
+
+
