@@ -424,10 +424,10 @@ public class ResponsiveGUIGraph extends JPanel {
         repaint();
     }
 
-    public void showSelectedGUI(Point p) {
+    public void showSelectedGUI(Point locationOnScreen) {
         if (m_point_selected==null)
             return;
-        m_point_selected.showGUI(p);
+        m_point_selected.showGUI(locationOnScreen);
     }
 
 //    private void calcDelauny(Vector2D point1, Vector2D point2, Vector2D point3) {
@@ -441,11 +441,6 @@ public class ResponsiveGUIGraph extends JPanel {
     private void addDelauny(Vector2D point) {
         if (this.m_Delauny != null)
             this.m_Delauny.addPoint(point);
-
-        System.out.println("Die Punkte der Algebra: ");
-        for (int i = 0; i<m_points.size(); i++) {
-            System.out.println("\tPunkte : "+m_points.get(i).getDesiredSize());
-        }
     }
 
     private void drawDelauny() {
@@ -474,26 +469,19 @@ public class ResponsiveGUIGraph extends JPanel {
         repaint();
     }
 
-//    public boolean createResponsiveGUI() {
-//        if (m_points !=null && m_points.size() >=1) {
-////            new ResponsiveGUIFrame(this.getPoints());
-//            ALMResponsiveLayout respLayout = new ALMResponsiveLayout(m)
-//
-//            return true;
-//        } else
-//            return false;
-//
-//    }
-
     /**
      * Opens the GUI, defined for a certain Size described by the parameter.
      * It also returns the Container Object which will be shown, for further manipulation.
      *
-     * @param p
+     * @param locationOnScreen
      * @return
      */
-    public JFrame showGUIAtSize(Point p) {
-        return getPointAtSize(p).showGUI(p);
+    public JFrame showGUIAtSize(Point locationOnPanel, Point locationOnScreen) {
+        return getPointAtSize(getPositionInGraph(locationOnPanel)).showGUI(locationOnScreen);
+    }
+
+    public JFrame getGUIAtSize(Point p) {
+        return getPointAtSize(p).getGUI();
     }
 
     public IResponsivePart[] getResponsiveParts() {

@@ -44,7 +44,7 @@ public class AssemblyPoint extends Abstract_Graph_Point {
     }
 
     @Override
-    public JFrame showGUI(Point p) {
+    public JFrame showGUI(Point e) {
         VariantManager vm = new VariantManager(m_parent, this, m_points.toArray(new ResponsiveGUIGraph_Point[m_points.size()]));
         vm.setVisible(true);
         return vm;
@@ -54,5 +54,9 @@ public class AssemblyPoint extends Abstract_Graph_Point {
         m_points = new ArrayList<ResponsiveGUIGraph_Point>();
         for (ResponsiveGUIGraph_Point point: variants)
             m_points.add(point);
+    }
+
+    public JFrame getGUI() {
+        return null;
     }
 }

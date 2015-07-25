@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="ALM:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ALM_jar</output-path>
+    <root id="archive" name="ALM.jar">
+      <element id="module-output" name="ALM" />
+      <element id="module-output" name="alm" />
+      <element id="module-output" name="android" />
+      <element id="module-output" name="androidtest" />
+      <element id="module-output" name="swing" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/androidtest/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/classes.jar" path-in-jar="/" />
+      <element id="dir-copy" path="$PROJECT_DIR$/androidtest/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res" />
+      <element id="extracted-dir" path="E:/Program Files (x86)/Android/android-sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/androidtest/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/libs/internal_impl-22.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/androidtest/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/classes.jar" path-in-jar="/" />
+      <element id="dir-copy" path="$PROJECT_DIR$/androidtest/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/res" />
+    </root>
+  </artifact>
+</component>

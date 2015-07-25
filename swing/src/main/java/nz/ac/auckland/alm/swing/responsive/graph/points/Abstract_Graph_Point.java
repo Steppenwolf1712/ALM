@@ -4,6 +4,7 @@ import nz.ac.auckland.alm.swing.responsive.graph.Vector2D;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 
 /**
@@ -53,5 +54,7 @@ public abstract class Abstract_Graph_Point {
         return ownSize.sub(toCompare).getQuadLength();
     }
 
-    public abstract JFrame showGUI(Point p);
+    public abstract JFrame showGUI(Point e);
+
+    public abstract JFrame getGUI();
 }

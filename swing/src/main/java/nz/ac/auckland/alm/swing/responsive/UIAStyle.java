@@ -25,27 +25,37 @@ public class UIAStyle extends DefaultStyledDocument implements Parser.IListener 
 
     public UIAStyle() {
         StyleConstants.setFontSize(BRACKET, FONT_SIZE);
+        StyleConstants.setBold(BRACKET, false);
+        StyleConstants.setItalic(BRACKET, false);
         StyleConstants.setForeground(BRACKET, new Color(80, 160, 255));
 
         StyleConstants.setFontSize(MISTAKE, FONT_SIZE);
+        StyleConstants.setBold(MISTAKE, false);
+        StyleConstants.setItalic(MISTAKE, false);
         StyleConstants.setForeground(MISTAKE, new Color(255,0,0));
 
         StyleConstants.setFontSize(IDENTIFIER, FONT_SIZE);
+        StyleConstants.setBold(IDENTIFIER, false);
+        StyleConstants.setItalic(IDENTIFIER, false);
         StyleConstants.setForeground(IDENTIFIER,new Color(80, 0, 255));
 
         StyleConstants.setFontSize(STAR, FONT_SIZE);
         StyleConstants.setBold(STAR, true);
+        StyleConstants.setItalic(STAR, false);
         StyleConstants.setForeground(STAR, new Color(0,180,0));
 
         StyleConstants.setFontSize(TILING, FONT_SIZE);
         StyleConstants.setBold(TILING, true);
+        StyleConstants.setItalic(TILING, false);
         StyleConstants.setForeground(TILING, new Color(195, 104, 60));
 
         StyleConstants.setFontSize(STACKING, FONT_SIZE);
         StyleConstants.setBold(STACKING, true);
+        StyleConstants.setItalic(STACKING, false);
         StyleConstants.setForeground(STACKING, new Color(123,60,195));
 
         StyleConstants.setFontSize(BRACKETID, FONT_SIZE);
+        StyleConstants.setBold(BRACKETID, false);
         StyleConstants.setItalic(BRACKETID, true);
         StyleConstants.setForeground(BRACKETID, new Color(190,120,255));
     }
@@ -58,19 +68,13 @@ public class UIAStyle extends DefaultStyledDocument implements Parser.IListener 
     private void highlighting() throws BadLocationException {
         m_text = getText(0, getLength());
 
-
-
         if (!m_text.isEmpty())
             paintEverything();
     }
 
     public void remove(int offset, int len) throws BadLocationException {
         super.remove(offset, len);
-
-        m_text = getText(0, getLength());
-
-        if (!m_text.isEmpty())
-            paintEverything();
+        highlighting();
     }
 
     private void paintCharacters(int index) {
@@ -118,7 +122,9 @@ public class UIAStyle extends DefaultStyledDocument implements Parser.IListener 
     private void paintEverything() {
         paintCharacters(0);
 
-        Lexer lexer = new Lexer(m_text);
+        String temp = m_text.replaceAll("\\s","");
+
+        Lexer lexer = new Lexer(temp);
         Parser parser = new Parser(lexer.run(), Parser.getDefaultAreaFactory(), this);/*new Parser.IListener() {
             @Override
             public void onError(String error, Lexer.Token token) {
@@ -136,8 +142,27 @@ public class UIAStyle extends DefaultStyledDocument implements Parser.IListener 
 
     @Override
     public void onError(String error, Lexer.Token token) {
-        setCharacterAttributes(token.position, m_text.length(), MISTAKE, false);
+        int realErrorPosition = getPositionWithWhitespace(token.position);
+
+        setCharacterAttributes(realErrorPosition, m_text.length(), MISTAKE, false);
         return;
+    }
+
+    private int getPositionWithWhitespace(int position) {
+        int counts = countWhiteSpace(0, position);
+        return position+counts;
+    }
+
+    private int countWhiteSpace(int start, int end) {
+        String temp = m_text.substring(start, end);
+        String temp2 = temp.replaceAll("\\s", "");
+        int count = temp.length() - temp2.length();
+
+        if (count == 0)
+            return 0;
+        else {
+            return count + countWhiteSpace(end, end + count);
+        }
     }
 
     /*

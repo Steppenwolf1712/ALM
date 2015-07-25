@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: nz.ac.auckland.alm.swing.test.responsive.ResponsiveGUIEdit
+ orTest
+

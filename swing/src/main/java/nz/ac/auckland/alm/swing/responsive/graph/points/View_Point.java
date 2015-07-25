@@ -29,12 +29,19 @@ public class View_Point extends Abstract_Graph_Point {
 
     @Override
     public JFrame showGUI(Point p) {
-        JFrame erg = m_parent.showGUIAtSize(p);
+        JFrame erg = m_parent.getGUIAtSize(p);
+        erg.setVisible(false);
+        erg.getContentPane().setPreferredSize(m_dimension);
+        erg.pack();
+        int x = (int)(p.getX() - (erg.getWidth() / 2)<=0?0:p.getX() - (erg.getWidth() / 2));
+        int y = (int)(p.getY() - (erg.getHeight() / 2)<=0?0:p.getY() - (erg.getHeight() / 2));
+        erg.setLocation(x, y);
         erg.setResizable(false);
-        erg.setSize(new Dimension(m_dimension.width*2, m_dimension.height*2));
-        erg.getContentPane().setSize(m_dimension);
-        erg.setLocation((int) p.getX() - (erg.getWidth() / 2), (int) p.getY() - (erg.getHeight() / 2));
         erg.setVisible(true);
         return erg;
+    }
+
+    public JFrame getGUI() {
+        return null;
     }
 }

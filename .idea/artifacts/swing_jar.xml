@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="swing:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/swing_jar</output-path>
+    <root id="archive" name="swing.jar">
+      <element id="module-output" name="swing" />
+      <element id="module-output" name="alm" />
+    </root>
+  </artifact>
+</component>

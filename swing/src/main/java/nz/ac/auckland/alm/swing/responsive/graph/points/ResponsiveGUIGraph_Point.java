@@ -50,12 +50,19 @@ public class ResponsiveGUIGraph_Point extends Abstract_Graph_Point implements IR
 
 
     public JFrame showGUI(Point p) {
-        this.m_view.setLocation((int) p.getX() - (this.m_view.getWidth() / 2), (int) p.getY() - (this.m_view.getHeight() / 2));
-        this.m_view.pack();
+        if (p == null) {
+            this.m_view.setLocationRelativeTo(null);
+        } else {
+            this.m_view.setLocation((int) p.getX() - (this.m_view.getWidth() / 2), (int) p.getY() - (this.m_view.getHeight() / 2));
+        }
+        this.m_view.getContentPane().setPreferredSize(this.getDesiredSize());
         this.m_view.setResizable(true);
-        this.m_view.setVisible(true);
         this.m_view.pack();
+        this.m_view.setVisible(true);
         return m_view;
+    }
+    public JFrame getGUI() {
+        return this.m_view;
     }
 
     @Override

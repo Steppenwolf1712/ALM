@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by Marc Janßen on 10.07.2015.
@@ -66,7 +67,7 @@ public class VariantManager extends JFrame implements ActionListener {
                 JTable table = (JTable)e.getSource();
                 int modelRow = Integer.valueOf( e.getActionCommand() );
                 ResponsiveGUIGraph_Point point = ((VariantManager_Model) table.getModel()).getVariant(modelRow);//removeRow(modelRow);//removeVariant(modelRow);
-                point.showGUI(new Point(200, 200));
+                point.showGUI(null);
             }
         };
         new VariantManager_Renderer(m_contentTable, show, 2);
