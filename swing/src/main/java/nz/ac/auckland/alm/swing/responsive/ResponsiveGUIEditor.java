@@ -204,7 +204,6 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             m_resp_Gui_Graph.showKontextMenu(e);
         }
-
     }
 
     @Override
