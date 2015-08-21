@@ -15,7 +15,7 @@ import nz.ac.auckland.alm.YTab;
 import java.util.Map;
 
 
-abstract class AbstractVerticalDirection implements IDirection<YTab, XTab> {
+abstract public class AbstractVerticalDirection implements IDirection<YTab, XTab> {
   @Override
   public Edge getEdge(IArea area, Map<YTab, Edge> map) {
     return map.get(getTab(area));

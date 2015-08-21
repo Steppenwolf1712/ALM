@@ -398,7 +398,7 @@ public class ResponsiveGUIGraph extends JPanel {
         repaint();
     }
 
-    private Abstract_Graph_Point getPointAtSize(Point p) {
+    public Abstract_Graph_Point getPointAtSize(Point p) {
         Abstract_Graph_Point erg = null;
         if (m_points.size() == 1) {
             erg = m_points.get(0);

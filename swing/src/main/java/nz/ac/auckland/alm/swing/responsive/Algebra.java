@@ -2,15 +2,15 @@ package nz.ac.auckland.alm.swing.responsive;
 
 import nz.ac.auckland.alm.IArea;
 import nz.ac.auckland.alm.algebra.AlgebraData;
-import nz.ac.auckland.alm.algebra.string.Lexer;
 import nz.ac.auckland.alm.algebra.string.Parser;
 import nz.ac.auckland.alm.algebra.string.StringReader;
 import nz.ac.auckland.alm.swing.ALMLayout;
+import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AreaInfo;
 
-import javax.swing.*;
 import java.awt.*;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Marc Janßen on 16.07.2015.
@@ -20,6 +20,8 @@ public class Algebra {
     private final String m_UIAstring;
     private final AlgebraData m_Algebra;
     private ALMLayout m_layout = null;
+
+    private Map<IArea, AreaInfo> m_AreaInformation = null;
 
     public Algebra(String definition) {
         m_UIAstring = definition;
@@ -32,6 +34,26 @@ public class Algebra {
                 m_layout.getRight(),
                 m_layout.getBottom(),
                 Parser.getDefaultAreaFactory());
+
+        createAbstraction();
+    }
+
+    private void createAbstraction() {
+        m_AreaInformation = new HashMap<IArea, AreaInfo>();
+
+        List<IArea> areas = getAreas();
+
+        for (IArea area: areas) {
+            m_AreaInformation.put(area, new AreaInfo(m_Algebra, area));
+        }
+
+        for (IArea area: areas) {
+            m_AreaInformation.get(area).calcRemoveOp(area, m_AreaInformation);
+        }
+    }
+
+    public AreaInfo getAreaInfo(IArea about) {
+        return m_AreaInformation.get(about);
     }
 
     public AlgebraData getAlgebraDataCopy(ALMLayout layout) {

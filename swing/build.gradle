@@ -22,6 +22,11 @@ task runResponsiveGUIEditorTests(type: JavaExec) {
     main = "nz.ac.auckland.alm.swing.test.responsive.ResponsiveGUIEditorTest"
 }
 
+task runAreaInfoTest(type: JavaExec) {
+    classpath sourceSets.test.runtimeClasspath
+    main = "nz.ac.auckland.alm.swing.test.responsive.graph.alternatives.AeraInfoTest"
+}
+
 // Task "distZip" added by plugin "java-library-distribution":
 distZip.shouldRunAfter(build)
 
