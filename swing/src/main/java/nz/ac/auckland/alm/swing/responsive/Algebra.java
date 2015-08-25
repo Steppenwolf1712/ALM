@@ -48,7 +48,7 @@ public class Algebra {
         }
 
         for (IArea area: areas) {
-            m_AreaInformation.get(area).calcRemoveOp(area, m_AreaInformation);
+            m_AreaInformation.get(area).initiateInformation(area, m_AreaInformation);
         }
     }
 

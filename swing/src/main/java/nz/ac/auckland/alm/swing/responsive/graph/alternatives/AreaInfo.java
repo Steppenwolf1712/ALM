@@ -8,15 +8,37 @@ import nz.ac.auckland.alm.algebra.*;
 import java.util.*;
 
 /**
- * Created by Marc Janßen on 12.08.2015.
+ * Created by Marc Janï¿½en on 12.08.2015.
  */
 public class AreaInfo {
 
-    List<XTab> m_LeftVisible;
-    List<XTab> m_RightVisible;
+    List<Edge> m_LeftVisible;
+    List<Edge> m_RightVisible;
 
-    List<YTab> m_TopVisible;
-    List<YTab> m_BottomVisible;
+    List<Edge> m_TopVisible;
+    List<Edge> m_BottomVisible;
+
+    List<IArea> m_leftNeighbors;
+    List<IArea> m_rightNeighbors;
+
+    List<IArea> m_topNeighbors;
+    List<IArea> m_botNeighbors;
+
+    public List<IArea> getLeftNeighbors() {
+        return m_leftNeighbors;
+    }
+
+    public List<IArea> getRightNeighbors() {
+        return m_rightNeighbors;
+    }
+
+    public List<IArea> getTopNeighbors() {
+        return m_topNeighbors;
+    }
+
+    public List<IArea> getBottomNeighbors() {
+        return m_botNeighbors;
+    }
 
     private final AlgebraData m_data;
     private ImplodeState horiState;
@@ -35,10 +57,15 @@ public class AreaInfo {
     }
 
     private void initData() {
-        m_BottomVisible = new ArrayList<YTab>();
-        m_LeftVisible = new ArrayList<XTab>();
-        m_RightVisible = new ArrayList<XTab>();
-        m_TopVisible = new ArrayList<YTab>();
+        m_BottomVisible = new ArrayList<Edge>();
+        m_LeftVisible = new ArrayList<Edge>();
+        m_RightVisible = new ArrayList<Edge>();
+        m_TopVisible = new ArrayList<Edge>();
+
+        m_leftNeighbors = new ArrayList<IArea>();
+        m_rightNeighbors = new ArrayList<IArea>();
+        m_topNeighbors = new ArrayList<IArea>();
+        m_botNeighbors = new ArrayList<IArea>();
     }
 
     private void readBottomVisible(IArea area) {
@@ -57,14 +84,14 @@ public class AreaInfo {
         readHorizontal(new LeftDirection(), area, m_LeftVisible);
     }
 
-    private void readHorizontal(AbstractHorizontalDirection direction, IArea area, List<XTab> xTabList) {
-        xTabList.add(direction.getTab(area));
+    private void readHorizontal(AbstractHorizontalDirection direction, IArea area, List<Edge> xTabList) {
+        xTabList.add(getEdge(direction, area));
         for (IArea neighbor: getNeighborAreas(direction, area))
             readHorizontal(direction, neighbor, xTabList);
     }
 
-    private void readVertical(AbstractVerticalDirection direction, IArea area, List<YTab> yTabList) {
-        yTabList.add(direction.getTab(area));
+    private void readVertical(AbstractVerticalDirection direction, IArea area, List<Edge> yTabList) {
+        yTabList.add(getEdge(direction, area));
         for (IArea neighbor: getNeighborAreas(direction, area))
             readVertical(direction, neighbor, yTabList);
     }
@@ -73,9 +100,98 @@ public class AreaInfo {
         return direction.getAreas(direction.getEdge(area, direction.getTabEdgeMap(m_data)));
     }
 
-    public void calcRemoveOp(IArea area, Map<IArea, AreaInfo> m_areaInformation) {
+    public void initiateInformation(IArea area, Map<IArea, AreaInfo> m_areaInformation) {
+        calcNeighbors(area, m_areaInformation);
+
         horiState = calcRemoveHorizontalImplodeState(area, m_areaInformation);
         vertiState = calcRemoveVerticalImplodeState(area, m_areaInformation);
+    }
+
+    private void calcNeighbors(IArea area, Map<IArea, AreaInfo> m_areaInformation) {
+        Collection<IArea> horizontal = new HashSet<IArea>(), vertical = new HashSet<IArea>();
+
+        IDirection topDirec = new TopDirection();
+
+        horizontal.addAll(topDirec.getOppositeDirection().getAreas(getEdge(topDirec, area)));
+        //horizontal.addAll(topDirec.getAreas(getEdge(topDirec.getOppositeDirection(), area)));//Not necessary...
+        // to catch all neighbors that touches the same side of the observed area and ONLY this side,
+        // there has to be an Area which shares the same top AND Bottom tabstop. Otherwise the Area Combination is just to big
+        // and touches also others areas.
+
+        IDirection leftDirec = new LeftDirection();
+
+        vertical.addAll(leftDirec.getOppositeDirection().getAreas(getEdge(leftDirec, area)));
+        //vertical.addAll(leftDirec.getAreas(getEdge(leftDirec.getOppositeDirection(), area)));
+
+        Edge leftSide = getEdge(leftDirec, area), rightSide = getEdge(leftDirec.getOppositeDirection(), area),
+                topSide = getEdge(topDirec, area), botSide = getEdge(topDirec.getOppositeDirection(), area);
+
+        IArea leftTopNeighbor = null, rightTopNeighbor = null, space = null;
+        for (IArea hori: horizontal) {
+            space = getNeighborOf(area, leftDirec, hori);
+            if (space != null)
+                rightTopNeighbor = space;
+            space = getNeighborOf(area, leftDirec.getOppositeDirection(), hori);
+            if (space != null)
+                leftTopNeighbor = space;
+        }
+
+        IArea topLeftNeighbor = null, botLeftNeighbor = null;
+        for (IArea verti: vertical) {
+            space = getNeighborOf(area, topDirec, verti);
+            if (space != null)
+                botLeftNeighbor = space;
+            space = getNeighborOf(area, topDirec.getOppositeDirection(), verti);
+            if (space != null)
+                topLeftNeighbor = space;
+        }
+
+        ArrayList<IArea> temp = null;
+        if (rightTopNeighbor != null && m_areaInformation.get(rightTopNeighbor).m_BottomVisible.contains(botSide)) {
+            temp = getNeighborsAlongArea(area, rightTopNeighbor, botSide, topDirec.getOppositeDirection(), leftDirec);
+            if (temp != null && temp.size() != 0)
+                m_rightNeighbors.addAll(temp);
+        }
+        if (leftTopNeighbor != null && m_areaInformation.get(leftTopNeighbor).m_BottomVisible.contains(botSide)) {
+            temp = getNeighborsAlongArea(area, leftTopNeighbor, botSide, topDirec.getOppositeDirection(), leftDirec.getOppositeDirection());
+            if (temp != null && temp.size() != 0)
+                m_leftNeighbors.addAll(temp);
+        }
+        if (topLeftNeighbor != null && m_areaInformation.get(topLeftNeighbor).m_RightVisible.contains(rightSide)) {
+            temp = getNeighborsAlongArea(area, topLeftNeighbor, rightSide, leftDirec.getOppositeDirection(), topDirec.getOppositeDirection());
+            if (temp != null && temp.size() != 0)
+                m_topNeighbors.addAll(temp);
+        }
+        if (botLeftNeighbor != null && m_areaInformation.get(botLeftNeighbor).m_RightVisible.contains(rightSide)) {
+            temp = getNeighborsAlongArea(area, botLeftNeighbor, rightSide, leftDirec.getOppositeDirection(), topDirec);
+            if (temp != null && temp.size() != 0)
+                m_botNeighbors.addAll(temp);
+        }
+    }
+
+    private ArrayList<IArea> getNeighborsAlongArea(IArea area, IArea startArea, Edge endEdge, IDirection searchDirection, IDirection along) {
+        ArrayList<IArea> rNeighbors = new ArrayList<IArea>();
+
+        IArea space = startArea;
+        rNeighbors.add(space);
+        List<IArea> tempList;
+        //System.out.println("Noch so ein Test mit Area: "+area.getId()+"mit Start: "+startArea.getId()+"und RIchtung: "+searchDirection);
+        while (!getEdge(searchDirection, space).equals(endEdge)) {
+            tempList = getNeighborAreas(searchDirection, space);
+            if (tempList.isEmpty())
+                    return null;
+            for (IArea test : tempList) {
+                space = getNeighborOf(area, along, test);
+                if (space != null)
+                    break;
+            }
+            if (space == null)
+                return null;
+
+            rNeighbors.add(space);
+        }
+
+        return rNeighbors;
     }
 
     public ImplodeState getImplodeState() {
@@ -85,7 +201,7 @@ public class AreaInfo {
             return vertiState;
     }
 
-    private ImplodeState calcRemoveVerticalImplodeState(IArea area, Map<IArea, AreaInfo> m_areaInformation) {
+    private ImplodeState calcRemoveVerticalImplodeState(IArea area, Map<IArea, AreaInfo> areaInformation) {
         IDirection topDirection = new TopDirection();
         List<IArea> topNeighbors = getNeighbors(topDirection, area);
         boolean topIsEmpty = topNeighbors.size() == 0;
@@ -104,7 +220,13 @@ public class AreaInfo {
         } else if (bottomIsEmpty)
             return ImplodeState.Vertical_Implode_Top;
         else {
-            boolean verticalObstacle = searchForObstacles(topDirection.getOppositeDirection(), topNeighbors, getEdge(topDirection.getOppositeDirection(), area));
+            boolean verticalObstacle = false;//searchForObstacles(topDirection.getOppositeDirection(), topNeighbors, getEdge(topDirection.getOppositeDirection(), area));
+            Edge toCheck = getEdge(topDirection.getOppositeDirection(), area);
+            for (IArea temp: topNeighbors)
+                if (areaInformation.get(temp).m_BottomVisible.contains(toCheck)) {
+                    verticalObstacle = true;
+                    break;
+                }
 
             if (verticalObstacle) {
                 return ImplodeState.Vertical_Implode_None;
@@ -116,9 +238,14 @@ public class AreaInfo {
             sum.addAll(topNeighbors);
             sum.addAll(bottomNeighbors);
 
+            IArea space = null;
             for (IArea test: sum) {
-                rightNeighbors.addAll(getNeighborOf(area, leftDirection, test));
-                leftNeighbors.addAll(getNeighborOf(area, rightDirection, test));
+                space = getNeighborOf(area, leftDirection, test);
+                if (space != null)
+                    rightNeighbors.add(space);
+                space = getNeighborOf(area, rightDirection, test);
+                if (space != null)
+                    leftNeighbors.add(space);
             }
 
             Edge topEdge = getEdge(topDirection, area), botEdge = getEdge(bottomDirection, area);
@@ -174,18 +301,28 @@ public class AreaInfo {
         }
     }
 
-    private Collection<IArea> getNeighborOf(IArea source, IDirection directionToSource, IArea test) {
-        Collection<IArea> erg = new HashSet<IArea>();
+    /**
+     * This Method returns the IArea test, if this IArea is a Neighbor of the source IArea-Object in the given IDirection.
+     *
+     * @param source
+     * @param directionToSource
+     * @param test
+     * @return
+     */
+    private IArea getNeighborOf(IArea source, IDirection directionToSource, IArea test) {
+        IArea erg = null;
 
         List<IArea> test_List = getNeighborAreas(directionToSource, test);
-        for (IArea left: test_List)
-            if (left.equals(source))
-                erg.add(test);
+        for (IArea item: test_List)
+            if (item.equals(source)) {
+                return test;//erg.add(test);
+                //break;
+            }
 
         return erg;
     }
 
-    private ImplodeState calcRemoveHorizontalImplodeState(IArea area, Map<IArea, AreaInfo> m_areaInformation) {
+    private ImplodeState calcRemoveHorizontalImplodeState(IArea area, Map<IArea, AreaInfo> areaInformation) {
         IDirection leftDirection = new LeftDirection();
         List<IArea> leftNeighbors = getNeighbors(leftDirection, area);
         boolean leftIsEmpty = leftNeighbors.size() == 0;
@@ -204,7 +341,13 @@ public class AreaInfo {
         } else if (rightIsEmpty)
             return ImplodeState.Horizontal_Implode_Left;
         else {
-            boolean horizontalObstacle = searchForObstacles(leftDirection.getOppositeDirection(), leftNeighbors, getEdge(leftDirection.getOppositeDirection(), area));
+            boolean horizontalObstacle = false;//searchForObstacles(leftDirection.getOppositeDirection(), leftNeighbors, getEdge(leftDirection.getOppositeDirection(), area));
+            Edge toCheck = getEdge(leftDirection.getOppositeDirection(), area);
+            for (IArea temp: leftNeighbors)
+                if (areaInformation.get(temp).m_RightVisible.contains(toCheck)) {
+                    horizontalObstacle = true;
+                    break;
+                }
 
             if (horizontalObstacle) {
                 return ImplodeState.Horizontal_Implode_None;
@@ -216,9 +359,14 @@ public class AreaInfo {
             sum.addAll(leftNeighbors);
             sum.addAll(rightNeighbors);
 
+            IArea space = null;
             for (IArea test: sum) {
-                topNeighbors.addAll(getNeighborOf(area, bottomDirection, test));
-                bottomNeighbors.addAll(getNeighborOf(area, topDirection, test));
+                space = getNeighborOf(area, bottomDirection, test);
+                if (space != null)
+                    topNeighbors.add(space);
+                space = getNeighborOf(area, topDirection, test);
+                if (space != null)
+                    bottomNeighbors.add(space);
             }
 
             Edge leftEdge = getEdge(leftDirection, area), rightEdge = getEdge(rightDirection, area);
