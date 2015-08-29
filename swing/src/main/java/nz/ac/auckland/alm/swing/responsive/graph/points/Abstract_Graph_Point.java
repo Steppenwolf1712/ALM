@@ -1,5 +1,6 @@
 package nz.ac.auckland.alm.swing.responsive.graph.points;
 
+import nz.ac.auckland.alm.swing.responsive.Algebra;
 import nz.ac.auckland.alm.swing.responsive.graph.Vector2D;
 
 import javax.swing.*;

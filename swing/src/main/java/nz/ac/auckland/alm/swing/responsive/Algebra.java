@@ -5,9 +5,11 @@ import nz.ac.auckland.alm.algebra.AlgebraData;
 import nz.ac.auckland.alm.algebra.string.Parser;
 import nz.ac.auckland.alm.algebra.string.StringReader;
 import nz.ac.auckland.alm.swing.ALMLayout;
+import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AlternativeGUI;
 import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AreaInfo;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +81,16 @@ public class Algebra {
 
     public Dimension getPreferredSize(Container con) {
         return m_layout.preferredLayoutSize(con);
+    }
+
+    public AlternativeGUI[] getAlternatives() {
+        ArrayList<AlternativeGUI> erg = new ArrayList<AlternativeGUI>();
+
+        for (Map.Entry<IArea, AreaInfo> set: m_AreaInformation.entrySet()){
+            erg.add(new AlternativeGUI(this, set.getKey(), set.getValue()));
+        }
+
+        return erg.toArray(new AlternativeGUI[erg.size()]);
     }
 
     //TODO: There is maybe the need of an intelligent Equals method to evaluate whether the AlgebraFrameFactory has initiate a new JFrame or not

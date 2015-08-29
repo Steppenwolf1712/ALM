@@ -38,8 +38,9 @@ public class AlgebraFrameFactory {
 //            if (initArea == null)
 //                return null;
 //            IArea area = initArea;
+            IArea area = null;
             while (iter_Areas.hasNext()) {
-                IArea area = iter_Areas.next();
+                area = iter_Areas.next();
                 Component comp = factory.getWidget(area.getId(), erg, layout);
                 erg.add(comp, new ALMLayout.LayoutParams(
                         area.getLeft(),
@@ -49,6 +50,33 @@ public class AlgebraFrameFactory {
                 Area realArea = layout.areaOf(comp);
                 realArea.setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
             }
+        }
+
+        return erg;
+    }
+
+    public static JPanel createTestPanel(Algebra algebra) {
+        JPanel erg = new JPanel();
+
+        ALMLayout alm = algebra.getLayout();
+        erg.setLayout(alm);
+
+        Iterator<IArea> iter_Areas = algebra.getAreas().iterator();
+
+        IArea area = null;
+        while (iter_Areas.hasNext()) {
+            area = iter_Areas.next();
+            Component comp = new JButton(area.getId());
+            comp.setEnabled(false);
+            comp.setForeground(Color.black);
+            erg.add(comp, new ALMLayout.LayoutParams(
+                    area.getLeft(),
+                    area.getTop(),
+                    area.getRight(),
+                    area.getBottom()
+            ));
+            Area realArea = alm.areaOf(comp);
+            realArea.setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
         }
 
         return erg;

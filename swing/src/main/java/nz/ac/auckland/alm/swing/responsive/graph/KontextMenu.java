@@ -1,8 +1,10 @@
 package nz.ac.auckland.alm.swing.responsive.graph;
 
 
+import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AlternativeManager;
 import nz.ac.auckland.alm.swing.responsive.graph.points.Abstract_Graph_Point;
 import nz.ac.auckland.alm.swing.responsive.graph.points.AssemblyPoint;
+import nz.ac.auckland.alm.swing.responsive.graph.points.ResponsiveGUIGraph_Point;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +16,7 @@ import java.awt.event.ActionListener;
  */
 public class KontextMenu extends JPopupMenu implements ActionListener {
 
+    private JMenuItem btn_alternativeManager = new JMenuItem("Alternative Manager");
     private JMenuItem btn_remove = new JMenuItem("Remove GUI");
     private JMenuItem btn_addViewPoint = new JMenuItem("Add View Point");
     private final Abstract_Graph_Point m_point;
@@ -34,10 +37,15 @@ public class KontextMenu extends JPopupMenu implements ActionListener {
         add(btn_addViewPoint);
         btn_remove.addActionListener(this);//;MouseListener(this);
         add(btn_remove);
+        if (m_point instanceof ResponsiveGUIGraph_Point) {
+            btn_alternativeManager.addActionListener(this);
+            add(btn_alternativeManager);
+        }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        this.setVisible(false);
 
         if (e.getSource().equals(btn_remove)) {
             if (m_point instanceof AssemblyPoint) {
@@ -50,8 +58,12 @@ public class KontextMenu extends JPopupMenu implements ActionListener {
             m_graph.remove(m_point);
         } else if (e.getSource().equals(btn_addViewPoint)) {
             m_graph.addViewPoint(m_callPoint);
+        } else if (e.getSource().equals(btn_alternativeManager)) {
+            AlternativeManager mgr = new AlternativeManager(((ResponsiveGUIGraph_Point)m_point).getAlgebraData());
+            mgr.setLocationRelativeTo(null);
+            mgr.setVisible(true);
+            mgr.pack();
         }
-        this.setVisible(false);
     }
 
     public void show(Component parent, int x, int y) {

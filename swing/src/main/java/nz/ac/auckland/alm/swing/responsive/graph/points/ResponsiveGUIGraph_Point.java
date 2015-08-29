@@ -49,6 +49,10 @@ public class ResponsiveGUIGraph_Point extends Abstract_Graph_Point implements IR
     }
 
 
+    public Algebra getAlgebraData() {
+        return this.m_algebra;
+    }
+
     public JFrame showGUI(Point p) {
         if (p == null) {
             this.m_view.setLocationRelativeTo(null);

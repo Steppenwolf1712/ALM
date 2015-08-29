@@ -1,8 +1,6 @@
 package nz.ac.auckland.alm.swing.responsive.graph.alternatives;
 
 import nz.ac.auckland.alm.IArea;
-import nz.ac.auckland.alm.XTab;
-import nz.ac.auckland.alm.YTab;
 import nz.ac.auckland.alm.algebra.*;
 
 import java.util.*;
@@ -43,6 +41,9 @@ public class AreaInfo {
     private final AlgebraData m_data;
     private ImplodeState horiState;
     private ImplodeState vertiState;
+
+    public static final String S_AREA_PLACEHOLDER = "§§§";
+
 
     public AreaInfo(AlgebraData data, IArea area) {
         m_data = data;
@@ -195,7 +196,7 @@ public class AreaInfo {
     }
 
     public ImplodeState getImplodeState() {
-        if (horiState.priorize(vertiState)<0) {
+        if (horiState.priority(vertiState)<0) {
             return horiState;
         } else
             return vertiState;
@@ -459,24 +460,44 @@ public class AreaInfo {
         return direc.getEdge(area, direc.getTabEdgeMap(m_data));
     }
 
+    public String getDescription() {
+        return getImplodeState().getDescription();
+    }
+
     public enum ImplodeState {
-        Vertical_Implode(1), Vertical_Implode_Top(3), Vertical_Implode_Bottom(3),
-        Vertical_Implode_Middle(5), Vertical_Implode_Middle_Top(7), Vertical_Implode_Middle_Bottom(7), Vertical_Implode_None(9),
-        Horizontal_Implode(0), Horizontal_Implode_Left(2), Horizontal_Implode_Right(2),
-        Horizontal_Implode_Middle(4), Horizontal_Implode_Middle_Left(6), Horizontal_Implode_Middle_Right(6), Horizontal_Implode_None(8);
+        Vertical_Implode(1, "<html>Description:<br>(Vertical-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the two tabstops on top and under the area, will be merged together. There are no obstacles, between the affected tabstops.</html>"),
+        Vertical_Implode_Top(3, "<html>Description:<br>(Top-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the bottom of the area will be merged into the top-tabstop. There are no obstacles, between the affected tabstops.</html>"),
+        Vertical_Implode_Bottom(3, "<html>Description:<br>(Bottom-Merge)The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the top of the area will be merged into the bottom-tabstop. There are no obstacles between the affected tabstops.</html>"),
+        Vertical_Implode_Middle(5, "<html>Description:<br>(Local-Vertical-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get a new tabstop. The new tabstop lies between the old top and bottom tabstops."),
+        Vertical_Implode_Middle_Top(7, "<html>Description:<br>(Local-Top-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the top-tabstop."),
+        Vertical_Implode_Middle_Bottom(7, "<html>Description:<br>(Local-Bottom-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the bottom-tabstop."),
+        Vertical_Implode_None(9, "<html>Description:<br>(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER+""),
+        Horizontal_Implode(0, "<html>Description:<br>(Horizontal-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the two tabstops on the left and one the right side of the area, will be merged together. There are no obstacles, between the affected tabstops.</html>"),
+        Horizontal_Implode_Left(2, "<html>Description:<br>(Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the right side of the area will be merged into the left-tabstop. There are no obstacles, between the affected tabstops.</html>"),
+        Horizontal_Implode_Right(2, "<html>Description:<br>(Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the left of the area will be merged into the right-tabstop. There are no obstacles between the affected tabstops.</html>"),
+        Horizontal_Implode_Middle(4, "<html>Description:<br>(Local-Horizontal-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get a new tabstop. The new tabstop lies between the old left and right tabstops."),
+        Horizontal_Implode_Middle_Left(6, "<html>Description:<br>(Local-Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the left-tabstop."),
+        Horizontal_Implode_Middle_Right(6, "<html>Description:<br>(Local-Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the right-tabstop."),
+        Horizontal_Implode_None(8, "<html>Description:<br>(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER);
 
         private int m_compareValue;
+        private String m_description;
 
-        ImplodeState(int compareValue) {
+        ImplodeState(int compareValue, String description) {
             m_compareValue = compareValue;
+            m_description = description;
         }
 
         public int getCompareValue() {
             return m_compareValue;
         }
 
-        public int priorize(ImplodeState state) {
+        public int priority(ImplodeState state) {
             return Integer.compare(this.m_compareValue, state.getCompareValue());
+        }
+
+        public String getDescription() {
+            return this.m_description;
         }
 
         public String toString() {
