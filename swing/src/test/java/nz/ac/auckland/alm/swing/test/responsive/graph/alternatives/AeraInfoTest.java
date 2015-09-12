@@ -45,7 +45,7 @@ public class AeraInfoTest {
 
     private String readInfos(AreaInfo info, IArea area) {
         String erg = "Priorized Implode-State of "+area.getId()+":\n\t"+info.getImplodeState().toString();
-        erg += "Neighbors:\n\tTop: ";
+        erg += "\nNeighbors:\n\tTop: ";
         for (IArea temp: info.getTopNeighbors())
             erg += temp.getId()+",";
         erg += "\n";

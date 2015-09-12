@@ -55,8 +55,8 @@ public class AlgebraFrameFactory {
         return erg;
     }
 
-    public static JPanel createTestPanel(Algebra algebra) {
-        JPanel erg = new JPanel();
+    public static ALMPanel createTestPanel(Algebra algebra) {
+        ALMPanel erg = new ALMPanel();
 
         ALMLayout alm = algebra.getLayout();
         erg.setLayout(alm);

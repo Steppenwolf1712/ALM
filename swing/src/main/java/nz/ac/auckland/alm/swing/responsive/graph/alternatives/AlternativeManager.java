@@ -1,5 +1,6 @@
 package nz.ac.auckland.alm.swing.responsive.graph.alternatives;
 
+import nz.ac.auckland.alm.swing.responsive.ALMPanel;
 import nz.ac.auckland.alm.swing.responsive.Algebra;
 import nz.ac.auckland.alm.swing.responsive.AlgebraFrameFactory;
 
@@ -24,6 +25,8 @@ public class AlternativeManager extends JFrame implements ActionListener {
     private JButton btn_removeArea;
     private JLabel l_AreaInfoDescribtion;
 
+    private ALMPanel m_preview = null;
+
     public AlternativeManager(Algebra algebraData) {
         super("Alternative Manager");
         m_data = algebraData;
@@ -42,24 +45,25 @@ public class AlternativeManager extends JFrame implements ActionListener {
         JPanel topPanel = new JPanel();
         topPanel.setBorder(BorderFactory.createEmptyBorder(3, 5, 5, 3));
 //        split.setTopComponent(topPanel);
-        add(topPanel, BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
 
-        initTopPanel(topPanel);
 
         JPanel botPanel = new JPanel();
         botPanel.setBorder(BorderFactory.createEmptyBorder(3, 5, 5, 3));
 //        split.setBottomComponent(botPanel);
-        add(botPanel, BorderLayout.SOUTH);
+        add(botPanel, BorderLayout.CENTER);
 
         initBotPanel(botPanel);
+        initTopPanel(topPanel);
     }
 
     private void initBotPanel(JPanel botPanel) {
-        JScrollPane scrollpane = new JScrollPane(AlgebraFrameFactory.createTestPanel(m_data));
-        scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollpane.setPreferredSize(new Dimension(390, 120));
-        botPanel.add(scrollpane);
+        m_preview = AlgebraFrameFactory.createTestPanel(m_data);
+        JScrollPane scrollPanel = new JScrollPane(m_preview);
+        scrollPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPanel.setMaximumSize(new Dimension(500, 500));
+        botPanel.add(scrollPanel);
     }
 
     private void initTopPanel(JPanel topPanel) {
@@ -104,7 +108,13 @@ public class AlternativeManager extends JFrame implements ActionListener {
 
     private void updateDescription() {
         AlternativeGUI temp = cbx_alternatives.getItemAt(cbx_alternatives.getSelectedIndex());
-        l_AreaInfoDescribtion.setText(temp.getDescription());
+        l_AreaInfoDescribtion.setText(prepareHTML(temp.getDescription()));
+
+        temp.configurePanel(m_preview);
+    }
+
+    private String prepareHTML(String description) {
+        return "<html><p>Description:<br>"+description+"</html>";
     }
 
     @Override
