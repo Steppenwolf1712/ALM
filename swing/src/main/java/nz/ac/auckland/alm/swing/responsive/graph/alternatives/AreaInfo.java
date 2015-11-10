@@ -10,6 +10,7 @@ import java.util.*;
  */
 public class AreaInfo {
 
+    private final IArea m_area;
     List<Edge> m_LeftVisible;
     List<Edge> m_RightVisible;
 
@@ -17,25 +18,41 @@ public class AreaInfo {
     List<Edge> m_BottomVisible;
 
     List<IArea> m_leftNeighbors;
+    List<IArea> m_localLeftNeighbors;
     List<IArea> m_rightNeighbors;
+    List<IArea> m_localRightNeighbors;
 
     List<IArea> m_topNeighbors;
+    List<IArea> m_localTopNeighbors;
     List<IArea> m_botNeighbors;
+    List<IArea> m_localBotNeighbors;
 
     public List<IArea> getLeftNeighbors() {
         return m_leftNeighbors;
+    }
+    public List<IArea> getLocalLeftNeighbors() {
+        return m_localLeftNeighbors;
     }
 
     public List<IArea> getRightNeighbors() {
         return m_rightNeighbors;
     }
+    public List<IArea> getLocalRightNeighbors() {
+        return m_localRightNeighbors;
+    }
 
     public List<IArea> getTopNeighbors() {
         return m_topNeighbors;
     }
+    public List<IArea> getLocalTopNeighbors() {
+        return m_localTopNeighbors;
+    }
 
     public List<IArea> getBottomNeighbors() {
         return m_botNeighbors;
+    }
+    public List<IArea> getLocalBottomNeighbors() {
+        return m_localBotNeighbors;
     }
 
     private final AlgebraData m_data;
@@ -49,6 +66,8 @@ public class AreaInfo {
         m_data = data;
 
         initData();
+
+        m_area = area;
 
         readLeftVisible(area);
         readRightVisible(area);
@@ -67,6 +86,10 @@ public class AreaInfo {
         m_rightNeighbors = new ArrayList<IArea>();
         m_topNeighbors = new ArrayList<IArea>();
         m_botNeighbors = new ArrayList<IArea>();
+    }
+
+    public IArea getAreaOfConcern() {
+        return m_area;
     }
 
     private void readBottomVisible(IArea area) {

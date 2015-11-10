@@ -1,12 +1,15 @@
 package nz.ac.auckland.alm.swing.responsive;
 
+import nz.ac.auckland.alm.Area;
 import nz.ac.auckland.alm.IArea;
-import nz.ac.auckland.alm.algebra.AlgebraData;
+import nz.ac.auckland.alm.XTab;
+import nz.ac.auckland.alm.algebra.*;
 import nz.ac.auckland.alm.algebra.string.Parser;
 import nz.ac.auckland.alm.algebra.string.StringReader;
 import nz.ac.auckland.alm.swing.ALMLayout;
 import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AlternativeGUI;
 import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AreaInfo;
+import nz.ac.auckland.linsolve.Variable;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -92,6 +95,46 @@ public class Algebra {
 
         return erg.toArray(new AlternativeGUI[erg.size()]);
     }
+
+    /**
+     * Returns all HalfEdges without those of the frame.
+     *
+     * @return
+     */
+    public ArrayList<HalfEdge> getHalfEdges() {
+        ArrayList<HalfEdge> halfEdges = new ArrayList<HalfEdge>();
+
+        //IDirection topDirec = new TopDirection(), botDirec = new BottomDirection(),
+        //       leftDirec = new LeftDirection(), rightDirec = new RightDirection();
+
+        Variable topTab = m_Algebra.getTop(), botTab = m_Algebra.getBottom(),
+                leftTab = m_Algebra.getLeft(), rightTab = m_Algebra.getRight(),
+                temp = null;
+
+        Iterable<IArea> iter = m_Algebra.getAllAreas();
+        for (IArea area: iter) {
+            temp = area.getTop();
+            if (!temp.equals(topTab))
+                halfEdges.add(new HalfEdge(area, new TopDirection()));
+            temp = area.getBottom();
+            if (!temp.equals(botTab))
+                halfEdges.add(new HalfEdge(area, new BottomDirection()));
+            temp = area.getLeft();
+            if (!temp.equals(leftTab))
+                halfEdges.add(new HalfEdge(area, new LeftDirection()));
+            temp = area.getRight();
+            if (!temp.equals(rightTab))
+                halfEdges.add(new HalfEdge(area, new RightDirection()));
+        }
+
+        return halfEdges;
+    }
+
+    public Edge getEdge(IDirection direc, IArea area) {
+        return direc.getEdge(area, direc.getTabEdgeMap(m_Algebra));
+    }
+
+
 
     //TODO: There is maybe the need of an intelligent Equals method to evaluate whether the AlgebraFrameFactory has initiate a new JFrame or not
 }
