@@ -3,6 +3,7 @@ package nz.ac.auckland.alm.swing.responsive;
 import nz.ac.auckland.alm.Area;
 import nz.ac.auckland.alm.IArea;
 import nz.ac.auckland.alm.XTab;
+import nz.ac.auckland.alm.YTab;
 import nz.ac.auckland.alm.algebra.*;
 import nz.ac.auckland.alm.algebra.string.Parser;
 import nz.ac.auckland.alm.algebra.string.StringReader;
@@ -134,6 +135,21 @@ public class Algebra {
         return direc.getEdge(area, direc.getTabEdgeMap(m_Algebra));
     }
 
+    public XTab getLeft() {
+        return this.m_layout.getLeft();
+    }
+
+    public XTab getRight() {
+        return this.m_layout.getRight();
+    }
+
+    public YTab getTop() {
+        return this.m_layout.getTop();
+    }
+
+    public YTab getBottom() {
+        return this.m_layout.getBottom();
+    }
 
 
     //TODO: There is maybe the need of an intelligent Equals method to evaluate whether the AlgebraFrameFactory has initiate a new JFrame or not

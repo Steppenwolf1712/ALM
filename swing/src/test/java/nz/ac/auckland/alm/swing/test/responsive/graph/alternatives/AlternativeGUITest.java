@@ -27,11 +27,14 @@ public class AlternativeGUITest extends AreaInfoTest {
             considerNoneImplodes = false;
 
         Algebra algebra = tester.testMidLeft();
+        System.out.println("Test of MidLeft");
         for (IArea area: algebra.getAreas()) {
             AreaInfo info = algebra.getAreaInfo(area);
 
-            if (!considerNoneImplodes && info.getImplodeState().getCompareValue()>=AreaInfo.ImplodeState.Horizontal_Implode_None.getCompareValue())
+            if (!considerNoneImplodes && info.getImplodeState().getCompareValue()>=AreaInfo.ImplodeState.Horizontal_Implode_None.getCompareValue()) {
+
                 continue;
+            }
 
             AlternativeGUI gui = new AlternativeGUI(algebra, area, info);
 
@@ -40,5 +43,55 @@ public class AlternativeGUITest extends AreaInfoTest {
             System.out.println("\tResulting string := "+gui.getAlternativeGUIString());
         }
 
+        algebra = tester.testGrid();
+        System.out.println("Test of Grid");
+        for (IArea area: algebra.getAreas()) {
+            AreaInfo info = algebra.getAreaInfo(area);
+
+            if (!considerNoneImplodes && info.getImplodeState().getCompareValue()>=AreaInfo.ImplodeState.Horizontal_Implode_None.getCompareValue()) {
+
+                continue;
+            }
+
+            AlternativeGUI gui = new AlternativeGUI(algebra, area, info);
+
+            System.out.println("AlternativeGUI (Without "+area.getId()+")\n");
+
+            System.out.println("\tResulting string := "+gui.getAlternativeGUIString());
+        }
+
+        algebra = tester.testPinWheel();
+        System.out.println("Test of PinWheel");
+        for (IArea area: algebra.getAreas()) {
+            AreaInfo info = algebra.getAreaInfo(area);
+
+            if (!considerNoneImplodes && info.getImplodeState().getCompareValue()>=AreaInfo.ImplodeState.Horizontal_Implode_None.getCompareValue()) {
+
+                continue;
+            }
+
+            AlternativeGUI gui = new AlternativeGUI(algebra, area, info);
+
+            System.out.println("AlternativeGUI (Without "+area.getId()+")\n");
+
+            System.out.println("\tResulting string := "+gui.getAlternativeGUIString());
+        }
+
+        algebra = tester.testThreeButton();
+        System.out.println("Test of ThreeButton");
+        for (IArea area: algebra.getAreas()) {
+            AreaInfo info = algebra.getAreaInfo(area);
+
+            if (!considerNoneImplodes && info.getImplodeState().getCompareValue()>=AreaInfo.ImplodeState.Horizontal_Implode_None.getCompareValue()) {
+
+                continue;
+            }
+
+            AlternativeGUI gui = new AlternativeGUI(algebra, area, info);
+
+            System.out.println("AlternativeGUI (Without "+area.getId()+")\n");
+
+            System.out.println("\tResulting string := "+gui.getAlternativeGUIString());
+        }
     }
 }
