@@ -277,7 +277,7 @@ public class AreaInfo {
                 if (leftNeighbors.size() == 1) {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
                         return ImplodeState.Vertical_Implode_Middle_Top;
-//                    if (getEdge(bottomDirection, leftNeighbors.get(0)).equals(botEdge))
+
                     else
                         return ImplodeState.Vertical_Implode_Middle_Bottom;
                 } else {
@@ -287,7 +287,7 @@ public class AreaInfo {
                 if (leftNeighbors.size() == 1) {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
                         return ImplodeState.Vertical_Implode_Top;
-//                    if (getEdge(bottomDirection, leftNeighbors.get(0)).equals(botEdge))
+
                     else
                         return ImplodeState.Vertical_Implode_Bottom;
                 } else if (leftNeighbors.size() == 0)
@@ -295,33 +295,26 @@ public class AreaInfo {
                 else
                     return ImplodeState.Vertical_Implode_Middle;
             } else {
+                boolean rightTop = getEdge(topDirection, rightNeighbors.get(0)).equals(topEdge);
                 if (leftNeighbors.size() == 1) {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
-                        if (getEdge(topDirection, rightNeighbors.get(0)).equals(topEdge))
+                        if (rightTop)
                             return ImplodeState.Vertical_Implode_Top;
-                        else
-                            return ImplodeState.Vertical_Implode_Middle;
                     else
-//                    if (getEdge(bottomDirection, leftNeighbors.get(0)).equals(botEdge))
-                        if (getEdge(topDirection, rightNeighbors.get(0)).equals(topEdge))
-                            return ImplodeState.Vertical_Implode_Middle;
-                        else
+                        if (!rightTop)
                             return ImplodeState.Vertical_Implode_Bottom;
-//                        return ImplodeState.Vertical_Implode_Middle_Bottom;
-//                    else
-//                        return ImplodeState.Vertical_Implode_Middle;
+
+                    return ImplodeState.Vertical_Implode_Middle;
                 } else if (leftNeighbors.size() == 0)
-                    if (getEdge(topDirection, rightNeighbors.get(0)).equals(topEdge))
+                    if (rightTop)
                         return ImplodeState.Vertical_Implode_Top;
                     else
                         return ImplodeState.Vertical_Implode_Bottom;
-                else if (getEdge(topDirection, rightNeighbors.get(0)).equals(topEdge))
+                else if (rightTop)
                     return ImplodeState.Vertical_Implode_Middle_Top;
                 else
                     return ImplodeState.Vertical_Implode_Middle_Bottom;
             }
-
-//            return ImplodeState.Vertical_Implode_Middle;
         }
     }
 
@@ -398,7 +391,6 @@ public class AreaInfo {
                 if (bottomNeighbors.size() == 1) {
                     if (getEdge(leftDirection, bottomNeighbors.get(0)).equals(leftEdge))
                         return ImplodeState.Horizontal_Implode_Middle_Left;
-//                    if (getEdge(rightDirection, bottomNeighbors.get(0)).equals(rightEdge))
                     else
                         return ImplodeState.Horizontal_Implode_Middle_Right;
                 } else {
@@ -408,7 +400,6 @@ public class AreaInfo {
                 if (bottomNeighbors.size() == 1) {
                     if (getEdge(leftDirection, bottomNeighbors.get(0)).equals(leftEdge))
                         return ImplodeState.Horizontal_Implode_Left;
-//                    if (getEdge(bottomDirection, leftNeighbors.get(0)).equals(botEdge))
                     else
                         return ImplodeState.Horizontal_Implode_Right;
                 } else if (bottomNeighbors.size() == 0)
@@ -416,33 +407,26 @@ public class AreaInfo {
                 else
                     return ImplodeState.Horizontal_Implode_Middle;
             } else {
+                boolean leftTop = getEdge(leftDirection, topNeighbors.get(0)).equals(leftEdge);
                 if (bottomNeighbors.size() == 1) {
                     if (getEdge(leftDirection, bottomNeighbors.get(0)).equals(leftEdge))
-                        if (getEdge(leftDirection, topNeighbors.get(0)).equals(leftEdge))
+                        if (leftTop)
                             return ImplodeState.Horizontal_Implode_Left;
-                        else
-                            return ImplodeState.Horizontal_Implode_Middle;
                     else
-//                    if (getEdge(rightDirection, topNeighbors.get(0)).equals(rightEdge))
-                        if (getEdge(leftDirection, topNeighbors.get(0)).equals(leftEdge))
-                            return ImplodeState.Horizontal_Implode_Middle;
-                        else
+                        if (!leftTop)
                             return ImplodeState.Horizontal_Implode_Right;
-//                        return ImplodeState.Vertical_Implode_Middle_Bottom;
-//                    else
-//                        return ImplodeState.Vertical_Implode_Middle;
+
+                    return ImplodeState.Horizontal_Implode_Middle;
                 } else if (bottomNeighbors.size() == 0)
-                    if (getEdge(leftDirection, topNeighbors.get(0)).equals(leftEdge))
+                    if (leftTop)
                         return ImplodeState.Horizontal_Implode_Left;
                     else
                         return ImplodeState.Horizontal_Implode_Right;
-                else if (getEdge(leftDirection, topNeighbors.get(0)).equals(leftEdge))
+                else if (leftTop)
                     return ImplodeState.Horizontal_Implode_Middle_Left;
                 else
                     return ImplodeState.Horizontal_Implode_Middle_Right;
             }
-
-//            return ImplodeState.Vertical_Implode_Middle;
         }
     }
 
