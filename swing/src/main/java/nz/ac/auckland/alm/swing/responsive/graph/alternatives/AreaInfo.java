@@ -252,9 +252,10 @@ public class AreaInfo {
                     break;
                 }
 
-            if (verticalObstacle) {
-                return ImplodeState.Vertical_Implode_None;
-            }
+//            This Code has to beremoved, while it destroys nearly every check and most of the restults wuold be none!
+//            if (verticalObstacle) {
+//                return ImplodeState.Vertical_Implode_None;
+//            }
 
             ArrayList<IArea> leftNeighbors = new ArrayList<IArea>(), rightNeighbors = new ArrayList<IArea>();
 
@@ -281,35 +282,63 @@ public class AreaInfo {
                     else
                         return ImplodeState.Vertical_Implode_Middle_Bottom;
                 } else {
-                    return ImplodeState.Vertical_Implode_Middle;
+                    return ImplodeState.Vertical_Implode_None;
+//                    return ImplodeState.Vertical_Implode_Middle;//First version
                 }
             } else if (rightNeighbors.size() == 0) {
                 if (leftNeighbors.size() == 1) {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
-                        return ImplodeState.Vertical_Implode_Top;
+
+                        if (verticalObstacle)
+                            return ImplodeState.Vertical_Implode_Middle_Top;
+                        else
+                            return ImplodeState.Vertical_Implode_Top;
 
                     else
-                        return ImplodeState.Vertical_Implode_Bottom;
+                        if (verticalObstacle)
+                            return ImplodeState.Vertical_Implode_Middle_Bottom;
+                        else
+                            return ImplodeState.Vertical_Implode_Bottom;
+
                 } else if (leftNeighbors.size() == 0)
-                    return ImplodeState.Vertical_Implode;
+
+                    if (verticalObstacle)
+                        return ImplodeState.Vertical_Implode_Middle_Top;
+                    else
+                        return ImplodeState.Vertical_Implode;
+
                 else
-                    return ImplodeState.Vertical_Implode_Middle;
+                    return ImplodeState.Vertical_Implode_None;
+//                    return ImplodeState.Vertical_Implode_Middle;((First Version
             } else {
                 boolean rightTop = getEdge(topDirection, rightNeighbors.get(0)).equals(topEdge);
                 if (leftNeighbors.size() == 1) {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
                         if (rightTop)
-                            return ImplodeState.Vertical_Implode_Top;
+                            if (verticalObstacle)
+                                return ImplodeState.Vertical_Implode_Middle_Top;
+                            else
+                                 return ImplodeState.Vertical_Implode_Top;
                     else
                         if (!rightTop)
-                            return ImplodeState.Vertical_Implode_Bottom;
+                            if (verticalObstacle)
+                                return ImplodeState.Vertical_Implode_Middle_Bottom;
+                            else
+                                return ImplodeState.Vertical_Implode_Bottom;
 
-                    return ImplodeState.Vertical_Implode_Middle;
+                    return ImplodeState.Vertical_Implode_None;
+//                    return ImplodeState.Vertical_Implode_Middle;//First Version;
                 } else if (leftNeighbors.size() == 0)
                     if (rightTop)
-                        return ImplodeState.Vertical_Implode_Top;
+                        if (verticalObstacle)
+                            return ImplodeState.Vertical_Implode_Middle_Top;
+                        else
+                            return ImplodeState.Vertical_Implode_Top;
                     else
-                        return ImplodeState.Vertical_Implode_Bottom;
+                        if (verticalObstacle)
+                            return ImplodeState.Vertical_Implode_Middle_Bottom;
+                        else
+                            return ImplodeState.Vertical_Implode_Bottom;
                 else if (rightTop)
                     return ImplodeState.Vertical_Implode_Middle_Top;
                 else
