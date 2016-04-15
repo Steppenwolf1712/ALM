@@ -47,6 +47,11 @@ public class AlternativeGUI {
         return description.replace(AreaInfo.S_AREA_PLACEHOLDER, areaID);
     }
 
+    /**
+     * This Method just sets Informations about the Changes of this alternative into the text of the certain buttons
+     *
+     * @param panel
+     */
     public void configurePanel(ALMPanel panel) {
         panel.reset_Complete();
 
@@ -58,18 +63,18 @@ public class AlternativeGUI {
                 panel.change_Button_Text(id, DIREC_RIGHT, DIREC_LEFT);
                 break;
             case Horizontal_Implode_Left:
-            case Horizontal_Implode_Middle_Left:
+            case Horizontal_Implode_local_Left:
                 panel.change_Button_Text(id, DIREC_LEFT, DIREC_LEFT);
                 break;
             case Horizontal_Implode_Right:
-            case Horizontal_Implode_Middle_Right:
+            case Horizontal_Implode_local_Right:
                 panel.change_Button_Text(id, DIREC_RIGHT, DIREC_RIGHT);
                 break;
             case Horizontal_Implode_None:
             case Vertical_Implode_None:
                 panel.change_Button_Text(id, DIREC_NONE, DIREC_NONE);
                 break;
-            case Vertical_Implode_Middle_Bottom:
+            case Vertical_Implode_local_Bottom:
             case Vertical_Implode_Bottom:
                 panel.change_Button_Text(id, DIREC_BOT, DIREC_BOT);
                 break;
@@ -78,7 +83,7 @@ public class AlternativeGUI {
                 panel.change_Button_Text(id, DIREC_TOP, DIREC_BOT);
                 break;
             case Vertical_Implode_Top:
-            case Vertical_Implode_Middle_Top:
+            case Vertical_Implode_local_Top:
                 panel.change_Button_Text(id, DIREC_TOP, DIREC_TOP);
                 break;
             default:
@@ -87,6 +92,12 @@ public class AlternativeGUI {
         }
     }
 
+    /**
+     * This method does the "Magic"! It converts the GUI to a String, calculate the necessarily changes to reach the
+     * alternative and applies them. The returned String holds a UIA-description of the alternative GUI.
+     *
+     * @return
+     */
     public String getAlternativeGUIString() {
         String erg = "";
 
@@ -114,7 +125,7 @@ public class AlternativeGUI {
                 temp_neighbors = m_info.getRightNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 Variable newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -126,7 +137,7 @@ public class AlternativeGUI {
                 temp_neighbors = m_info.getLeftNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -138,7 +149,7 @@ public class AlternativeGUI {
                 temp_neighbors = m_info.getLocalRightNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = new XTab();
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -151,30 +162,56 @@ public class AlternativeGUI {
                 for (IArea temp: temp_neighbors2)
                     addAreaToLayout(tabMap, temp, spec, direc.getOppositeDirection(), newTab);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
 //                toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
                 temp_neighbors.addAll(temp_neighbors2);
+
+                if (m_info.getVertiImplodeState().equals(AreaInfo.ImplodeState.Vertical_Implode_Middle)) {
+                    direc = new BottomDirection();
+                    temp_neighbors = m_info.getLocalBottomNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
+                    newTab = new YTab();
+
+                    toDel.addAll(calcHEtoDel(temp_neighbors, direc));
+                    toDel.addAll(getHEofArea(area));
+                    toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
+
+                    for (IArea temp: temp_neighbors)
+                        addAreaToLayout(tabMap, temp, spec, direc.getOppositeDirection(), newTab);
+
+                    direc = direc.getOppositeDirection();
+                    temp_neighbors2 = m_info.getLocalTopNeighbors();
+
+                    for (IArea temp: temp_neighbors2)
+                        addAreaToLayout(tabMap, temp, spec, direc.getOppositeDirection(), newTab);
+
+                    toDel.addAll(calcHEtoDel(temp_neighbors, direc));
+//                toDel.addAll(getHEofArea(area));
+                    toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
+
+                    temp_neighbors.addAll(temp_neighbors2);
+
+                }
                 break;
-            case Horizontal_Implode_Middle_Left:
+            case Horizontal_Implode_local_Left:
                 direc = new RightDirection();
                 temp_neighbors = m_info.getLocalRightNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
                 for (IArea temp: temp_neighbors)
                     addAreaToLayout(tabMap, temp, spec, direc.getOppositeDirection(), newTab);
                 break;
-            case Horizontal_Implode_Middle_Right:
+            case Horizontal_Implode_local_Right:
                 direc = new LeftDirection();
                 temp_neighbors = m_info.getLocalLeftNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -188,7 +225,7 @@ public class AlternativeGUI {
                 temp_neighbors = m_info.getBottomNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -200,7 +237,7 @@ public class AlternativeGUI {
                 temp_neighbors = m_info.getTopNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -212,7 +249,7 @@ public class AlternativeGUI {
                 temp_neighbors = m_info.getLocalBottomNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = new YTab();
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -220,35 +257,35 @@ public class AlternativeGUI {
                     addAreaToLayout(tabMap, temp, spec, direc.getOppositeDirection(), newTab);
 
                 direc = direc.getOppositeDirection();
-                temp_neighbors2 = m_info.getLocalLeftNeighbors();
+                temp_neighbors2 = m_info.getLocalTopNeighbors();
 
                 for (IArea temp: temp_neighbors2)
                     addAreaToLayout(tabMap, temp, spec, direc.getOppositeDirection(), newTab);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
 //                toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
                 temp_neighbors.addAll(temp_neighbors2);
                 break;
-            case Vertical_Implode_Middle_Top:
+            case Vertical_Implode_local_Top:
                 direc = new BottomDirection();
                 temp_neighbors = m_info.getLocalBottomNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
                 for (IArea temp: temp_neighbors)
                     addAreaToLayout(tabMap, temp, spec, direc.getOppositeDirection(), newTab);
                 break;
-            case Vertical_Implode_Middle_Bottom:
+            case Vertical_Implode_local_Bottom:
                 direc = new TopDirection();
                 temp_neighbors = m_info.getLocalTopNeighbors();//direc.getAreas(m_algebra.getEdge(direc, area));
                 newTab = direc.getOppositeTab(area);
 
-                toDel.addAll(calcHEtoDel(temp_neighbors, direc, area));
+                toDel.addAll(calcHEtoDel(temp_neighbors, direc));
                 toDel.addAll(getHEofArea(area));
                 toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
@@ -409,10 +446,9 @@ public class AlternativeGUI {
      *
      * @param neighbors
      * @param direc
-     * @param area
      * @return
      */
-    private Collection<? extends HalfEdge> calcHEtoDel(List<IArea> neighbors, IDirection direc, IArea area) {
+    private Collection<? extends HalfEdge> calcHEtoDel(List<IArea> neighbors, IDirection direc) {
         ArrayList<HalfEdge> erg = new ArrayList<HalfEdge>();
         for (IArea temp: neighbors)
             erg.add(new HalfEdge(temp, direc.getOppositeDirection()));

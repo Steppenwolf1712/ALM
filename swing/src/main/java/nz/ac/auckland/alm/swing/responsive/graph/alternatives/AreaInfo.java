@@ -1,5 +1,6 @@
 package nz.ac.auckland.alm.swing.responsive.graph.alternatives;
 
+import nz.ac.auckland.alm.HorizontalAlignment;
 import nz.ac.auckland.alm.IArea;
 import nz.ac.auckland.alm.algebra.*;
 
@@ -26,6 +27,9 @@ public class AreaInfo {
     List<IArea> m_localTopNeighbors;
     List<IArea> m_botNeighbors;
     List<IArea> m_localBotNeighbors;
+
+    private boolean verticalObstacle;
+    private boolean horizontalObstacle;
 
     public List<IArea> getLeftNeighbors() {
         return m_leftNeighbors;
@@ -124,6 +128,14 @@ public class AreaInfo {
         return direction.getAreas(direction.getEdge(area, direction.getTabEdgeMap(m_data)));
     }
 
+    public boolean hasHorizontalObstacles() {
+        return horizontalObstacle;
+    }
+
+    public boolean hasVerticalObstacles() {
+        return verticalObstacle;
+    }
+
     public void initiateInformation(IArea area, Map<IArea, AreaInfo> m_areaInformation) {
         calcNeighbors(area, m_areaInformation);
 
@@ -220,9 +232,17 @@ public class AreaInfo {
 
     public ImplodeState getImplodeState() {
         if (horiState.priority(vertiState)<0) {
-            return horiState;
+           return horiState;
         } else
             return vertiState;
+    }
+
+    public ImplodeState getHoriImplodeState() {
+        return horiState;
+    }
+
+    public ImplodeState getVertiImplodeState() {
+        return vertiState;
     }
 
     private ImplodeState calcRemoveVerticalImplodeState(IArea area, Map<IArea, AreaInfo> areaInformation) {
@@ -244,7 +264,7 @@ public class AreaInfo {
         } else if (bottomIsEmpty)
             return ImplodeState.Vertical_Implode_Top;
         else {
-            boolean verticalObstacle = false;//searchForObstacles(topDirection.getOppositeDirection(), topNeighbors, getEdge(topDirection.getOppositeDirection(), area));
+            verticalObstacle = false;//searchForObstacles(topDirection.getOppositeDirection(), topNeighbors, getEdge(topDirection.getOppositeDirection(), area));
             Edge toCheck = getEdge(topDirection.getOppositeDirection(), area);
             for (IArea temp: topNeighbors)
                 if (areaInformation.get(temp).m_BottomVisible.contains(toCheck)) {
@@ -252,7 +272,7 @@ public class AreaInfo {
                     break;
                 }
 
-//            This Code has to beremoved, while it destroys nearly every check and most of the restults wuold be none!
+//            This Code has to be removed, while it destroys nearly every check and most of the restults wuold be none!
 //            if (verticalObstacle) {
 //                return ImplodeState.Vertical_Implode_None;
 //            }
@@ -277,10 +297,10 @@ public class AreaInfo {
             if (rightNeighbors.size() > 1) {
                 if (leftNeighbors.size() == 1) {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
-                        return ImplodeState.Vertical_Implode_Middle_Top;
+                        return ImplodeState.Vertical_Implode_local_TopRight;
 
                     else
-                        return ImplodeState.Vertical_Implode_Middle_Bottom;
+                        return ImplodeState.Vertical_Implode_local_BottomRight;
                 } else {
                     return ImplodeState.Vertical_Implode_None;
 //                    return ImplodeState.Vertical_Implode_Middle;//First version
@@ -290,20 +310,20 @@ public class AreaInfo {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
 
                         if (verticalObstacle)
-                            return ImplodeState.Vertical_Implode_Middle_Top;
+                            return ImplodeState.Vertical_Implode_local_Top;
                         else
                             return ImplodeState.Vertical_Implode_Top;
 
                     else
                         if (verticalObstacle)
-                            return ImplodeState.Vertical_Implode_Middle_Bottom;
+                            return ImplodeState.Vertical_Implode_local_Bottom;
                         else
                             return ImplodeState.Vertical_Implode_Bottom;
 
                 } else if (leftNeighbors.size() == 0)
 
                     if (verticalObstacle)
-                        return ImplodeState.Vertical_Implode_Middle_Top;
+                        return ImplodeState.Vertical_Implode_local_Top;
                     else
                         return ImplodeState.Vertical_Implode;
 
@@ -316,33 +336,35 @@ public class AreaInfo {
                     if (getEdge(topDirection, leftNeighbors.get(0)).equals(topEdge))
                         if (rightTop)
                             if (verticalObstacle)
-                                return ImplodeState.Vertical_Implode_Middle_Top;
+                                return ImplodeState.Vertical_Implode_local_Top;
                             else
                                  return ImplodeState.Vertical_Implode_Top;
                     else
                         if (!rightTop)
                             if (verticalObstacle)
-                                return ImplodeState.Vertical_Implode_Middle_Bottom;
+                                return ImplodeState.Vertical_Implode_local_Bottom;
                             else
                                 return ImplodeState.Vertical_Implode_Bottom;
 
-                    return ImplodeState.Vertical_Implode_None;
-//                    return ImplodeState.Vertical_Implode_Middle;//First Version;
+                    if (!verticalObstacle)
+                        return ImplodeState.Vertical_Implode_Middle;//First Version;
+                    else
+                        return ImplodeState.Implode_None;
                 } else if (leftNeighbors.size() == 0)
                     if (rightTop)
                         if (verticalObstacle)
-                            return ImplodeState.Vertical_Implode_Middle_Top;
+                            return ImplodeState.Vertical_Implode_local_Top;
                         else
                             return ImplodeState.Vertical_Implode_Top;
                     else
                         if (verticalObstacle)
-                            return ImplodeState.Vertical_Implode_Middle_Bottom;
+                            return ImplodeState.Vertical_Implode_local_Bottom;
                         else
                             return ImplodeState.Vertical_Implode_Bottom;
                 else if (rightTop)
-                    return ImplodeState.Vertical_Implode_Middle_Top;
+                    return ImplodeState.Vertical_Implode_local_TopLeft;
                 else
-                    return ImplodeState.Vertical_Implode_Middle_Bottom;
+                    return ImplodeState.Vertical_Implode_local_BottomLeft;
             }
         }
     }
@@ -387,7 +409,7 @@ public class AreaInfo {
         } else if (rightIsEmpty)
             return ImplodeState.Horizontal_Implode_Left;
         else {
-            boolean horizontalObstacle = false;//searchForObstacles(leftDirection.getOppositeDirection(), leftNeighbors, getEdge(leftDirection.getOppositeDirection(), area));
+            horizontalObstacle = false;//searchForObstacles(leftDirection.getOppositeDirection(), leftNeighbors, getEdge(leftDirection.getOppositeDirection(), area));
             Edge toCheck = getEdge(leftDirection.getOppositeDirection(), area);
             for (IArea temp: leftNeighbors)
                 if (areaInformation.get(temp).m_RightVisible.contains(toCheck)) {
@@ -395,9 +417,11 @@ public class AreaInfo {
                     break;
                 }
 
-            if (horizontalObstacle) {
-                return ImplodeState.Horizontal_Implode_None;
-            }
+
+//            This Code has to be removed, while it destroys nearly every check and most of the restults wuold be none!
+//            if (horizontalObstacle) {
+//                return ImplodeState.Horizontal_Implode_None;
+//            }
 
             ArrayList<IArea> topNeighbors = new ArrayList<IArea>(), bottomNeighbors = new ArrayList<IArea>();
 
@@ -419,42 +443,71 @@ public class AreaInfo {
             if (topNeighbors.size() > 1) {
                 if (bottomNeighbors.size() == 1) {
                     if (getEdge(leftDirection, bottomNeighbors.get(0)).equals(leftEdge))
-                        return ImplodeState.Horizontal_Implode_Middle_Left;
+                        return ImplodeState.Horizontal_Implode_local_LeftTop;
                     else
-                        return ImplodeState.Horizontal_Implode_Middle_Right;
+                        return ImplodeState.Horizontal_Implode_local_RightTop;
                 } else {
-                    return ImplodeState.Horizontal_Implode_Middle;
+                    return ImplodeState.Horizontal_Implode_None;
                 }
             } else if (topNeighbors.size() == 0) {
                 if (bottomNeighbors.size() == 1) {
                     if (getEdge(leftDirection, bottomNeighbors.get(0)).equals(leftEdge))
-                        return ImplodeState.Horizontal_Implode_Left;
+                        if (horizontalObstacle)
+                            return ImplodeState.Horizontal_Implode_local_Left;
+                        else
+                            return ImplodeState.Horizontal_Implode_Left;
+
                     else
-                        return ImplodeState.Horizontal_Implode_Right;
+                        if (horizontalObstacle)
+                            return ImplodeState.Horizontal_Implode_local_Right;
+                        else
+                            return ImplodeState.Horizontal_Implode_Right;
+
                 } else if (bottomNeighbors.size() == 0)
-                    return ImplodeState.Horizontal_Implode;
+
+                    if (horizontalObstacle)
+                        return ImplodeState.Horizontal_Implode_local_Left;
+                    else
+                        return ImplodeState.Horizontal_Implode;
+
                 else
-                    return ImplodeState.Horizontal_Implode_Middle;
+                    return ImplodeState.Horizontal_Implode_None;
+
             } else {
                 boolean leftTop = getEdge(leftDirection, topNeighbors.get(0)).equals(leftEdge);
                 if (bottomNeighbors.size() == 1) {
                     if (getEdge(leftDirection, bottomNeighbors.get(0)).equals(leftEdge))
                         if (leftTop)
-                            return ImplodeState.Horizontal_Implode_Left;
+                            if (horizontalObstacle)
+                                return ImplodeState.Horizontal_Implode_local_Left;
+                            else
+                                return ImplodeState.Horizontal_Implode_Left;
                     else
                         if (!leftTop)
-                            return ImplodeState.Horizontal_Implode_Right;
+                            if (horizontalObstacle)
+                                return ImplodeState.Horizontal_Implode_local_Right;
+                            else
+                                return ImplodeState.Horizontal_Implode_Right;
 
-                    return ImplodeState.Horizontal_Implode_Middle;
+                    if (!horizontalObstacle)
+                        return ImplodeState.Horizontal_Implode_Middle;
+                    else
+                        return ImplodeState.Implode_None;
                 } else if (bottomNeighbors.size() == 0)
                     if (leftTop)
-                        return ImplodeState.Horizontal_Implode_Left;
+                        if (horizontalObstacle)
+                            return ImplodeState.Horizontal_Implode_local_Left;
+                        else
+                            return ImplodeState.Horizontal_Implode_Left;
                     else
-                        return ImplodeState.Horizontal_Implode_Right;
+                        if (horizontalObstacle)
+                            return ImplodeState.Horizontal_Implode_local_Right;
+                        else
+                            return ImplodeState.Horizontal_Implode_Right;
                 else if (leftTop)
-                    return ImplodeState.Horizontal_Implode_Middle_Left;
+                    return ImplodeState.Horizontal_Implode_local_LeftBot;
                 else
-                    return ImplodeState.Horizontal_Implode_Middle_Right;
+                    return ImplodeState.Horizontal_Implode_local_RightBot;
             }
         }
     }
@@ -505,16 +558,25 @@ public class AreaInfo {
         Vertical_Implode_Top(3, "(Top-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the bottom of the area will be merged into the top-tabstop. There are no obstacles, between the affected tabstops."),
         Vertical_Implode_Bottom(3, "(Bottom-Merge)The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the top of the area will be merged into the bottom-tabstop. There are no obstacles between the affected tabstops."),
         Vertical_Implode_Middle(5, "(Local-Vertical-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get a new tabstop. The new tabstop lies between the old top and bottom tabstops."),
-        Vertical_Implode_Middle_Top(7, "(Local-Top-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the top-tabstop."),
-        Vertical_Implode_Middle_Bottom(7, "(Local-Bottom-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the bottom-tabstop."),
-        Vertical_Implode_None(9, "(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER),
+        Vertical_Implode_local_Top(7, "(Local-Top-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the top-tabstop."),
+        Vertical_Implode_local_Bottom(7, "(Local-Bottom-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the bottom-tabstop."),
+        Vertical_Implode_local_TopLeft(9, "(Local-Top-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the top-tabstop."),
+        Vertical_Implode_local_TopRight(9, "(Local-Top-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the top-tabstop."),
+        Vertical_Implode_local_BottomLeft(9, "(Local-Bottom-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the bottom-tabstop."),
+        Vertical_Implode_local_BottomRight(9, "(Local-Bottom-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict vertical merge. Because of that, only the local, horizontal neighbors of the area shall get connected to the bottom-tabstop."),
+        Vertical_Implode_None(11, "(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER),
         Horizontal_Implode(0, "(Horizontal-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the two tabstops on the left and one the right side of the area, will be merged together. There are no obstacles, between the affected tabstops."),
         Horizontal_Implode_Left(2, "(Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the right side of the area will be merged into the left-tabstop. There are no obstacles, between the affected tabstops."),
         Horizontal_Implode_Right(2, "(Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed and the tabstop at the left of the area will be merged into the right-tabstop. There are no obstacles between the affected tabstops."),
         Horizontal_Implode_Middle(4, "(Local-Horizontal-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get a new tabstop. The new tabstop lies between the old left and right tabstops."),
-        Horizontal_Implode_Middle_Left(6, "(Local-Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the left-tabstop."),
-        Horizontal_Implode_Middle_Right(6, "(Local-Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the right-tabstop."),
-        Horizontal_Implode_None(8, "(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER);
+        Horizontal_Implode_local_Left(6, "(Local-Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the left-tabstop."),
+        Horizontal_Implode_local_Right(6, "(Local-Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the right-tabstop."),
+        Horizontal_Implode_local_LeftTop(8, "(Local-Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the left-tabstop."),
+        Horizontal_Implode_local_LeftBot(8, "(Local-Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the left-tabstop."),
+        Horizontal_Implode_local_RightTop(8, "(Local-Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the right-tabstop."),
+        Horizontal_Implode_local_RightBot(8, "(Local-Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the right-tabstop."),
+        Horizontal_Implode_None(10, "(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER),
+        Implode_None(12, "(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER);
 
         private int m_compareValue;
         private String m_description;
