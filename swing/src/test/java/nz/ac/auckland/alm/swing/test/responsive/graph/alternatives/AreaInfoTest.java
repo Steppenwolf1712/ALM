@@ -13,7 +13,7 @@ import java.util.List;
 public class AreaInfoTest {
 
     public final String MIDDLE_LEFT = "(A1|{right}C1)/(A2|{left}C2)/(A3|{left}B3|{right}C3)/(A4|{left}C4)";
-    public final String PINWHEEL = "(A|(B/{index1}E))/D*B/{index1}C*(E/D)|C";
+    public final String PINWHEEL = "(A|(B/{index1}E))/{index2}D*B/{index1}C*(E/{index2}D)|C";
     public final String THREEBUTTON = "A|B|C";
     public final String GRID = "(A1|{index1}B1|{index2}C1)/(A2|{index1}B2|{index2}C2)/(A3|{index1}B3|{index2}C3)";
 

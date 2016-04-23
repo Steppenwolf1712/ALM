@@ -121,8 +121,6 @@ public class AlternativeManager extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(btn_removeArea)) {
             AlternativeGUI alternative = (AlternativeGUI) cbx_alternatives.getSelectedItem();
-
-            
         }
     }
 }

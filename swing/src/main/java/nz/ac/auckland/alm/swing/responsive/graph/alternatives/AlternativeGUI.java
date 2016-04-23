@@ -191,7 +191,6 @@ public class AlternativeGUI {
                     toAdd.addAll(calcHEtoAdd(temp_neighbors, direc, newTab));
 
                     temp_neighbors.addAll(temp_neighbors2);
-
                 }
                 break;
             case Horizontal_Implode_local_Left:

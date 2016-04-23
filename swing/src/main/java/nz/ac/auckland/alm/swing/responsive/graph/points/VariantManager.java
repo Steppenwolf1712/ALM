@@ -116,12 +116,12 @@ public class VariantManager extends JFrame implements ActionListener {
         if (e.getSource().equals(btn_choose)) {
             if (m_model.getSize() == 1) {
                 m_parent.remove(m_ap);
-                m_parent.addPoint(m_model.getVariant(0));
+                m_parent.addPoint(m_model.getVariant(0), true);
             } else {
                 int i = m_contentTable.getSelectedRow();
                 if (i>=0) {
                     m_parent.remove(m_ap);
-                    m_parent.addPoint(m_model.getVariant(i));
+                    m_parent.addPoint(m_model.getVariant(i), true);
                 } else {
                     m_ap.resetVariants(m_model.getVariants());
                 }

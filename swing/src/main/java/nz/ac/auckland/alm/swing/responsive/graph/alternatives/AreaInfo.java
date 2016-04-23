@@ -1,6 +1,5 @@
 package nz.ac.auckland.alm.swing.responsive.graph.alternatives;
 
-import nz.ac.auckland.alm.HorizontalAlignment;
 import nz.ac.auckland.alm.IArea;
 import nz.ac.auckland.alm.algebra.*;
 
@@ -19,44 +18,48 @@ public class AreaInfo {
     List<Edge> m_BottomVisible;
 
     List<IArea> m_leftNeighbors;
-    List<IArea> m_localLeftNeighbors;
+//    List<IArea> m_localLeftNeighbors;
     List<IArea> m_rightNeighbors;
-    List<IArea> m_localRightNeighbors;
+//    List<IArea> m_localRightNeighbors;
 
     List<IArea> m_topNeighbors;
-    List<IArea> m_localTopNeighbors;
+//    List<IArea> m_localTopNeighbors;
     List<IArea> m_botNeighbors;
-    List<IArea> m_localBotNeighbors;
+//    List<IArea> m_localBotNeighbors;
 
     private boolean verticalObstacle;
     private boolean horizontalObstacle;
 
     public List<IArea> getLeftNeighbors() {
-        return m_leftNeighbors;
+        IDirection direc = new LeftDirection();
+        return getNeighborAreas(direc, m_area);
     }
     public List<IArea> getLocalLeftNeighbors() {
-        return m_localLeftNeighbors;
+        return m_leftNeighbors;
     }
 
     public List<IArea> getRightNeighbors() {
-        return m_rightNeighbors;
+        IDirection direc = new RightDirection();
+        return getNeighborAreas(direc, m_area);
     }
     public List<IArea> getLocalRightNeighbors() {
-        return m_localRightNeighbors;
+        return m_rightNeighbors;
     }
 
     public List<IArea> getTopNeighbors() {
-        return m_topNeighbors;
+        IDirection direc = new TopDirection();
+        return getNeighborAreas(direc, m_area);
     }
     public List<IArea> getLocalTopNeighbors() {
-        return m_localTopNeighbors;
+        return m_topNeighbors;
     }
 
     public List<IArea> getBottomNeighbors() {
-        return m_botNeighbors;
+        IDirection direc = new BottomDirection();
+        return getNeighborAreas(direc, m_area);
     }
     public List<IArea> getLocalBottomNeighbors() {
-        return m_localBotNeighbors;
+        return m_botNeighbors;
     }
 
     private final AlgebraData m_data;
@@ -68,10 +71,9 @@ public class AreaInfo {
 
     public AreaInfo(AlgebraData data, IArea area) {
         m_data = data;
+        m_area = area;
 
         initData();
-
-        m_area = area;
 
         readLeftVisible(area);
         readRightVisible(area);
@@ -164,20 +166,20 @@ public class AreaInfo {
 
         IArea leftTopNeighbor = null, rightTopNeighbor = null, space = null;
         for (IArea hori: horizontal) {
-            space = getNeighborOf(area, leftDirec, hori);
+            space = isNeighborOf(area, leftDirec, hori);
             if (space != null)
                 rightTopNeighbor = space;
-            space = getNeighborOf(area, leftDirec.getOppositeDirection(), hori);
+            space = isNeighborOf(area, leftDirec.getOppositeDirection(), hori);
             if (space != null)
                 leftTopNeighbor = space;
         }
 
         IArea topLeftNeighbor = null, botLeftNeighbor = null;
         for (IArea verti: vertical) {
-            space = getNeighborOf(area, topDirec, verti);
+            space = isNeighborOf(area, topDirec, verti);
             if (space != null)
                 botLeftNeighbor = space;
-            space = getNeighborOf(area, topDirec.getOppositeDirection(), verti);
+            space = isNeighborOf(area, topDirec.getOppositeDirection(), verti);
             if (space != null)
                 topLeftNeighbor = space;
         }
@@ -205,19 +207,31 @@ public class AreaInfo {
         }
     }
 
+    /**
+     * This method returns a set of areas which are local neighbors to an area, starting with the startArea and searching
+     * in a certain direction. While searching the areas will be proved as neighbors with the information about the direction of
+     * the neighborship (along shall be the direction from the neighbors to the main area)
+     *
+     * @param area
+     * @param startArea
+     * @param endEdge
+     * @param searchDirection
+     * @param along
+     * @return
+     */
     private ArrayList<IArea> getNeighborsAlongArea(IArea area, IArea startArea, Edge endEdge, IDirection searchDirection, IDirection along) {
         ArrayList<IArea> rNeighbors = new ArrayList<IArea>();
 
         IArea space = startArea;
         rNeighbors.add(space);
         List<IArea> tempList;
-        //System.out.println("Noch so ein Test mit Area: "+area.getId()+"mit Start: "+startArea.getId()+"und RIchtung: "+searchDirection);
+
         while (!getEdge(searchDirection, space).equals(endEdge)) {
             tempList = getNeighborAreas(searchDirection, space);
             if (tempList.isEmpty())
                     return null;
             for (IArea test : tempList) {
-                space = getNeighborOf(area, along, test);
+                space = isNeighborOf(area, along, test);
                 if (space != null)
                     break;
             }
@@ -231,10 +245,44 @@ public class AreaInfo {
     }
 
     public ImplodeState getImplodeState() {
+        ImplodeState erg = null;
+
         if (horiState.priority(vertiState)<0) {
-           return horiState;
+           erg = horiState;
         } else
-            return vertiState;
+            erg = vertiState;
+
+        if (erg.m_compareValue == ImplodeState.Horizontal_Implode_local_LeftBot.m_compareValue) {
+//               && erg.m_compareValue <= ImplodeState.Vertical_Implode_local_TopRight.m_compareValue) {
+            if (erg.equals(ImplodeState.Horizontal_Implode_local_RightBot)) {
+                if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_TopRight))
+                    return ImplodeState.Vertical_Implode_local_Top;
+                return ImplodeState.Horizontal_Implode_Right;
+            }
+            if (erg.equals(ImplodeState.Horizontal_Implode_local_RightTop)) {
+                if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_BottomRight))
+                    return ImplodeState.Vertical_Implode_Bottom;
+                return ImplodeState.Horizontal_Implode_Right;
+            }
+            if (erg.equals(ImplodeState.Horizontal_Implode_local_LeftTop)) {
+                if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_BottomLeft))
+                    return ImplodeState.Vertical_Implode_Bottom;
+                return ImplodeState.Horizontal_Implode_Left;
+            }
+            if (erg.equals(ImplodeState.Horizontal_Implode_local_LeftBot)) {
+                if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_TopLeft))
+                    return ImplodeState.Vertical_Implode_local_Top;
+                return ImplodeState.Horizontal_Implode_Left;
+            }
+        }
+        if (erg.m_compareValue == ImplodeState.Vertical_Implode_local_BottomLeft.m_compareValue) {
+            if (erg.equals(ImplodeState.Vertical_Implode_local_BottomLeft)
+                    || erg.equals(ImplodeState.Vertical_Implode_local_BottomRight))
+                return ImplodeState.Vertical_Implode_local_Bottom;
+            else
+                return ImplodeState.Vertical_Implode_local_Top;
+        }
+        return erg;
     }
 
     public ImplodeState getHoriImplodeState() {
@@ -247,14 +295,14 @@ public class AreaInfo {
 
     private ImplodeState calcRemoveVerticalImplodeState(IArea area, Map<IArea, AreaInfo> areaInformation) {
         IDirection topDirection = new TopDirection();
-        List<IArea> topNeighbors = getNeighbors(topDirection, area);
+        List<IArea> topNeighbors = getOrthoNeighbors(topDirection, area);
         boolean topIsEmpty = topNeighbors.size() == 0;
 
         IDirection leftDirection = new LeftDirection();
         IDirection rightDirection = new RightDirection();
 
         IDirection bottomDirection = new BottomDirection();
-        List<IArea> bottomNeighbors = getNeighbors(bottomDirection, area);
+        List<IArea> bottomNeighbors = getOrthoNeighbors(bottomDirection, area);
         boolean bottomIsEmpty = bottomNeighbors.size() == 0;
         if (topIsEmpty) {
             if (bottomIsEmpty)
@@ -285,10 +333,10 @@ public class AreaInfo {
 
             IArea space = null;
             for (IArea test: sum) {
-                space = getNeighborOf(area, leftDirection, test);
+                space = isNeighborOf(area, leftDirection, test);
                 if (space != null)
                     rightNeighbors.add(space);
-                space = getNeighborOf(area, rightDirection, test);
+                space = isNeighborOf(area, rightDirection, test);
                 if (space != null)
                     leftNeighbors.add(space);
             }
@@ -370,14 +418,15 @@ public class AreaInfo {
     }
 
     /**
-     * This Method returns the IArea test, if this IArea is a Neighbor of the source IArea-Object in the given IDirection.
+     * This Method returns the IArea test, if source is a Neighbor of the IArea-Object in the given IDirection.
+     * Null otherwise!
      *
      * @param source
      * @param directionToSource
      * @param test
      * @return
      */
-    private IArea getNeighborOf(IArea source, IDirection directionToSource, IArea test) {
+    private IArea isNeighborOf(IArea source, IDirection directionToSource, IArea test) {
         IArea erg = null;
 
         List<IArea> test_List = getNeighborAreas(directionToSource, test);
@@ -392,14 +441,14 @@ public class AreaInfo {
 
     private ImplodeState calcRemoveHorizontalImplodeState(IArea area, Map<IArea, AreaInfo> areaInformation) {
         IDirection leftDirection = new LeftDirection();
-        List<IArea> leftNeighbors = getNeighbors(leftDirection, area);
+        List<IArea> leftNeighbors = getOrthoNeighbors(leftDirection, area);
         boolean leftIsEmpty = leftNeighbors.size() == 0;
 
         IDirection topDirection = new TopDirection();
         IDirection bottomDirection = new BottomDirection();
 
         IDirection rightDirection = new RightDirection();
-        List<IArea> rightNeighbors = getNeighbors(rightDirection, area);
+        List<IArea> rightNeighbors = getOrthoNeighbors(rightDirection, area);
         boolean rightIsEmpty = rightNeighbors.size() == 0;
         if (leftIsEmpty) {
             if (rightIsEmpty)
@@ -431,10 +480,10 @@ public class AreaInfo {
 
             IArea space = null;
             for (IArea test: sum) {
-                space = getNeighborOf(area, bottomDirection, test);
+                space = isNeighborOf(area, bottomDirection, test);
                 if (space != null)
                     topNeighbors.add(space);
-                space = getNeighborOf(area, topDirection, test);
+                space = isNeighborOf(area, topDirection, test);
                 if (space != null)
                     bottomNeighbors.add(space);
             }
@@ -535,7 +584,7 @@ public class AreaInfo {
      * @param area
      * @return
      */
-    private List<IArea> getNeighbors(IDirection direc, IArea area) {
+    private List<IArea> getOrthoNeighbors(IDirection direc, IArea area) {
         Edge topEdge = getEdge(direc, area);
         List<IArea> allAreas = direc.getOppositeAreas(topEdge);
         List<IArea> erg = new ArrayList<IArea>();
@@ -575,8 +624,8 @@ public class AreaInfo {
         Horizontal_Implode_local_LeftBot(8, "(Local-Left-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the left-tabstop."),
         Horizontal_Implode_local_RightTop(8, "(Local-Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the right-tabstop."),
         Horizontal_Implode_local_RightBot(8, "(Local-Right-Merge) The Area "+S_AREA_PLACEHOLDER+" will be removed. There are affected areas which can scale up the whole GUI while a strict horizontal merge. Because of that, only the local, vertical neighbors of the area shall get connected to the right-tabstop."),
-        Horizontal_Implode_None(10, "(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER),
-        Implode_None(12, "(No operation) There were only obstacles found, while searching for a possibility to remove Area "+S_AREA_PLACEHOLDER);
+        Horizontal_Implode_None(10, "(No operation) There were only obstacles found, while searching for a possibility to remove the Area "+S_AREA_PLACEHOLDER),
+        Implode_None(12, "(No operation) There were only obstacles found, while searching for a possibility to remove the Area "+S_AREA_PLACEHOLDER);
 
         private int m_compareValue;
         private String m_description;

@@ -4,6 +4,7 @@ import nz.ac.auckland.alm.swing.ALMResponsiveLayout;
 import nz.ac.auckland.alm.swing.responsive.Algebra;
 import nz.ac.auckland.alm.swing.responsive.IResponsivePart;
 import nz.ac.auckland.alm.swing.responsive.ResponsiveGUIFrame;
+import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AlternativeGUI;
 import nz.ac.auckland.alm.swing.responsive.graph.delauny.DelaunyTriangle;
 import nz.ac.auckland.alm.swing.responsive.graph.delauny.DelaunyTriangle_Factory;
 import nz.ac.auckland.alm.swing.responsive.graph.delauny.LineDrawer;
@@ -78,8 +79,8 @@ public class ResponsiveGUIGraph extends JPanel {
 
     /**
      * This Method adds a specific Point to the ResponsiveGUIGraph, regarding the UIAlgebra-Parameter.
-     * If there was already an ALMLayout created out of the UIAlgebra, it can be stored with the ResponsiveGUIGraph
-     * into the Point-Object to save the collected Constraints collected so far.
+     * If there is already an ALMLayout created out of the UIAlgebra, it can be stored with the ResponsiveGUIGraph
+     * into the Point-Object to save the Constraints collected so far.
      *
      * @param toAdd
      * @param alm_Container
@@ -87,11 +88,11 @@ public class ResponsiveGUIGraph extends JPanel {
     public void addUIAlgebra(Algebra toAdd, JFrame alm_Container) {
         ResponsiveGUIGraph_Point temp = new ResponsiveGUIGraph_Point(this, toAdd, alm_Container);
 
-        addPoint(temp);
+        addPoint(temp, true);
     }
 
 
-    public void addPoint(ResponsiveGUIGraph_Point point) {
+    public void addPoint(ResponsiveGUIGraph_Point point, boolean repaint) {
         Abstract_Graph_Point collision = null;
         for (Abstract_Graph_Point iterator: m_points)
             if (iterator.compareToSize(point.getDesiredSize())<=POINT_MERGE_DISTANCE*POINT_MERGE_DISTANCE) {
@@ -109,7 +110,8 @@ public class ResponsiveGUIGraph extends JPanel {
                 AssemblyPoint ap = new AssemblyPoint(this, (ResponsiveGUIGraph_Point)collision, point);
                 this.m_points.add(ap);
             }
-            repaint();
+            if (repaint)
+                this.repaint();
             return;
         }
 
@@ -121,7 +123,58 @@ public class ResponsiveGUIGraph extends JPanel {
         if (m_points.size() >= 2 && !(m_Delauny==null))
             addDelauny(new Vector2D(point.getDesiredSize()));
 
-        this.repaint();
+        if (repaint)
+            this.repaint();
+    }
+
+    public void generateAlternatives(Algebra data) {
+        AlternativeGUI[] alternatives = data.getAlternatives();
+
+        Integer limit = null;
+        while (limit == null) {
+            String result = JOptionPane.showInputDialog(this, "Give a Limit for the subtraction (positive Number) or type how many GUI-Elements shall be removed(negative Number)");
+            if (result.isEmpty())
+                return;
+            try {
+                limit = Integer.parseInt(result);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, result+" is not a Number!");
+                continue;
+            }
+        }
+
+        if (limit<0) {
+            limit = data.getAreas().size()+limit;
+        }
+
+        for (AlternativeGUI gui: alternatives) {
+            helpGenerateAlternatives(gui, data, limit);
+        }
+    }
+
+    /**
+     * This method is a recursive helper method to start all generations for ResponsiveGUI_Points of all possible AlternativeGUIs.
+     * The original Algebra informations shall be passed on all recursive calls. With the original Algebra it shall be possible to calculate
+     * the original Names of the areas. Furthermore a limit for the subtraction will be passed on all recursive calls.
+     *
+     * @param gui
+     * @param origData
+     * @param limit
+     */
+    private void helpGenerateAlternatives(AlternativeGUI gui, Algebra origData, Integer limit) {
+        String sGUI = gui.getAlternativeGUIString();
+
+        Algebra algebra = new Algebra(sGUI);
+
+        if (limit < algebra.getAreas().size()) {
+            addUIAlgebra(algebra);
+            for (AlternativeGUI altGUI: algebra.getAlternatives()) {
+                helpGenerateAlternatives(altGUI, origData, limit);
+            }
+        } else if (limit == algebra.getAreas().size()) {
+            addUIAlgebra(algebra);
+        }
+
     }
 
     public boolean remove(Abstract_Graph_Point point) {
@@ -498,4 +551,5 @@ public class ResponsiveGUIGraph extends JPanel {
         IResponsivePart[] erg = new IResponsivePart[parts.size()];
         return parts.toArray(erg);
     }
+
 }
