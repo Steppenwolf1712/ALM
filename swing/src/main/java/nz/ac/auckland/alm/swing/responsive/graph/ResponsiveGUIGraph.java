@@ -5,6 +5,7 @@ import nz.ac.auckland.alm.swing.responsive.Algebra;
 import nz.ac.auckland.alm.swing.responsive.IResponsivePart;
 import nz.ac.auckland.alm.swing.responsive.ResponsiveGUIFrame;
 import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AlternativeGUI;
+import nz.ac.auckland.alm.swing.responsive.graph.alternatives.AreaInfo;
 import nz.ac.auckland.alm.swing.responsive.graph.delauny.DelaunyTriangle;
 import nz.ac.auckland.alm.swing.responsive.graph.delauny.DelaunyTriangle_Factory;
 import nz.ac.auckland.alm.swing.responsive.graph.delauny.LineDrawer;
@@ -49,6 +50,8 @@ public class ResponsiveGUIGraph extends JPanel {
 
     private DelaunyTriangle m_Delauny = null;
 
+
+    //This Flag enables the debug-mode with all delauny-triangles and midpoint in the Graph
     private boolean m_drawDelauny = false;
 
     public ResponsiveGUIGraph() {
@@ -100,6 +103,7 @@ public class ResponsiveGUIGraph extends JPanel {
                 break;
             }
         if (collision == null) {
+            System.out.println("ResponsiveGUIGraph: Adding a Point => "+point.getDesiredSize());
             this.m_points.add(point);
         } else {
             if (collision instanceof AssemblyPoint) {
@@ -130,9 +134,10 @@ public class ResponsiveGUIGraph extends JPanel {
     public void generateAlternatives(Algebra data) {
         AlternativeGUI[] alternatives = data.getAlternatives();
 
-        Integer limit = null;
+        Integer limit = null, max_size = data.getAreas().size();
         while (limit == null) {
-            String result = JOptionPane.showInputDialog(this, "Give a Limit for the subtraction (positive Number) or type how many GUI-Elements shall be removed(negative Number)");
+            String result = JOptionPane.showInputDialog(this, "Give a Limit for the subtraction (positive Number) or type how many GUI-Elements shall be removed(negative Number)!\n" +
+                    "The current number of areas is "+max_size+".");
             if (result.isEmpty())
                 return;
             try {
@@ -144,12 +149,17 @@ public class ResponsiveGUIGraph extends JPanel {
         }
 
         if (limit<0) {
-            limit = data.getAreas().size()+limit;
+            limit = max_size+limit;
+        }
+        if (Math.abs(limit)>max_size) {
+            JOptionPane.showMessageDialog(this, "The limit is bigger than expected/It is not possible to remove that many elements!\n");
+            return;
         }
 
         for (AlternativeGUI gui: alternatives) {
             helpGenerateAlternatives(gui, data, limit);
         }
+        this.repaint();
     }
 
     /**
@@ -164,17 +174,21 @@ public class ResponsiveGUIGraph extends JPanel {
     private void helpGenerateAlternatives(AlternativeGUI gui, Algebra origData, Integer limit) {
         String sGUI = gui.getAlternativeGUIString();
 
+        if (sGUI.equals(AlternativeGUI.S_IMPLODE_NONE))
+            return;
+
         Algebra algebra = new Algebra(sGUI);
 
-        if (limit < algebra.getAreas().size()) {
-            addUIAlgebra(algebra);
+        int count = algebra.getAreas().size();
+
+        if (limit < count) {
+            addPoint(new ResponsiveGUIGraph_Point(this, algebra, null), false);
             for (AlternativeGUI altGUI: algebra.getAlternatives()) {
                 helpGenerateAlternatives(altGUI, origData, limit);
             }
-        } else if (limit == algebra.getAreas().size()) {
-            addUIAlgebra(algebra);
+        } else if (limit == count && count > 0) {
+            addPoint(new ResponsiveGUIGraph_Point(this, algebra, null), false);
         }
-
     }
 
     public boolean remove(Abstract_Graph_Point point) {
@@ -189,9 +203,12 @@ public class ResponsiveGUIGraph extends JPanel {
             if (m_point_selected!=null && m_point_selected.equals(point)) {
                 m_point_selected = null;
             }
-            if (m_points.size()>=2)
+            if (m_points.size()>=2) {
                 calcDelauny(new Vector2D(m_points.get(0).getDesiredSize()),
                         new Vector2D(m_points.get(1).getDesiredSize()));
+                for (int i = 2; i<m_points.size(); i++)
+                    addDelauny(new Vector2D(m_points.get(i).getDesiredSize()));
+            }
             else
                 this.m_Delauny = null;
         }
@@ -497,7 +514,6 @@ public class ResponsiveGUIGraph extends JPanel {
     }
 
     private void drawDelauny() {
-        //this.m_Delauny.drawDelauny(this.m_LineDrawer);//For testing the DelaunyTriangulation
         this.m_Delauny.drawVoronoiDiagram(this.m_LineDrawer);
         if (m_drawDelauny) {
             m_LineDrawer.changeColor(new Color(255,0,0,255));
@@ -552,4 +568,8 @@ public class ResponsiveGUIGraph extends JPanel {
         return parts.toArray(erg);
     }
 
+    public void switchDelaunyMode() {
+        this.m_drawDelauny = !m_drawDelauny;
+        repaint();
+    }
 }

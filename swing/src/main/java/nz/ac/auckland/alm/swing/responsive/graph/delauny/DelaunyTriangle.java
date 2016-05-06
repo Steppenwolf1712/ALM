@@ -13,7 +13,7 @@ public class DelaunyTriangle {
 
     private ArrayList<DelaunyTriangle> m_listOfReplacements;
 
-    Vector2D m_vec_a, m_vec_b, m_vec_c;
+    final Vector2D m_vec_a, m_vec_b, m_vec_c;
 
     Map<Vector2D, Vector2D> m_thirdPointHelper = null;
     Map<Vector2D,DelaunyTriangle> m_NeighborTriangle = null;
@@ -57,6 +57,7 @@ public class DelaunyTriangle {
      */
     public void addPoint(Vector2D orig_vertic) {
         if (is_Final()) {
+//            System.out.println("DelaunyTriangle: add point to final triangle");
             if (pointOnEdge(orig_vertic)) {
                 return;
             }
@@ -87,10 +88,13 @@ public class DelaunyTriangle {
             ZCA.swapTestOn_At(m_vec_c, m_vec_a,orig_vertic);
 
         } else {
+            int counter = 0;
             for (DelaunyTriangle tri: m_listOfReplacements) {
                 if (tri.pointInTriangle(orig_vertic)) {
                     tri.addPoint(orig_vertic);
                     return;
+                } else {
+//                    System.out.println("DelaunyTriangle: "+(++counter)+" attempt of checking point in triangle fails");
                 }
             }
         }
@@ -362,13 +366,13 @@ public class DelaunyTriangle {
         Vector2D mid_AB = sortedVertices[0].add(sortedVertices[1]).mult(0.5);
         Vector2D mid_BC = sortedVertices[1].add(sortedVertices[2]).mult(0.5);
 
-        System.out.println("Ausgabe des Midpoints: ");
-        for (Vector2D vec: sortedVertices) {
-            System.out.println("\t"+vec);
-        }
-        System.out.println("\t"+b_minus_a);
-        System.out.println("\t"+c_minus_b);
-        System.out.println("\tTest: "+b_minus_a.getNormalisation()+"="+c_minus_b.getNormalisation()+":"+b_minus_a.getNormalisation().equals(c_minus_b.getNormalisation()));
+//        System.out.println("Ausgabe des Midpoints: ");
+//        for (Vector2D vec: sortedVertices) {
+//            System.out.println("\t"+vec);
+//        }
+//        System.out.println("\t"+b_minus_a);
+//        System.out.println("\t"+c_minus_b);
+//        System.out.println("\tTest: "+b_minus_a.getNormalisation()+"="+c_minus_b.getNormalisation()+":"+b_minus_a.getNormalisation().equals(c_minus_b.getNormalisation()));
 
         //The 3 points are on the same line
         if (b_minus_a.getNormalisation().equals(c_minus_b.getNormalisation())) {
@@ -443,7 +447,14 @@ public class DelaunyTriangle {
 
         if (vec1.getX() != 0.0) {
             vec2 = m_vec_c.sub(m_vec_a);
-            z = vector.sub(m_vec_a);
+
+            if (vec2.getX() != 0.0)
+                z = vector.sub(m_vec_a);
+            else {
+                vec1 = m_vec_a.sub(m_vec_b);
+                vec2 = m_vec_c.sub(m_vec_b);
+                z = vector.sub(m_vec_b);
+            }
         } else {
             vec1 = m_vec_b.sub(m_vec_c);
             vec2 = m_vec_a.sub(m_vec_c);
@@ -453,17 +464,20 @@ public class DelaunyTriangle {
         //    System.out.println("Unexpected Case: A DelaunyTriangle is not Sound!!!");
         //A Special Case that should not been possible
 
-        //double q_part = (z.getX() * vec2.getY()) / vec2.getX();
-        double p = (z.getY()*vec2.getX()-z.getX()*vec2.getY())/(vec1.getY()*vec2.getX()-vec1.getX()*vec2.getY());//(q_part - z.getY()) / (q_part - vec1.getY());
-        if (p < 0 && 1 < p)
+//        double q_part = (z.getX() * vec2.getY()) / vec2.getX();
+//        (q_part - z.getY()) / (q_part - vec1.getY());
+        double p = (z.getY()*vec2.getX()-z.getX()*vec2.getY())/(vec1.getY()*vec2.getX()-vec1.getX()*vec2.getY());
+//        System.out.println("DelaunyTrianlge: P = "+p);
+        if (p < 0 || 1 < p)
             return false;
 
         double q = (z.getX() - (p * vec1.getX())) / vec2.getX();
+//        System.out.println("DelaunyTriangle: Q = "+q);
         if (p + q <= 1 && 0 <= q) //TODO: TO CHECK
             return true;
         return false;
     }
-
+// Test
     public void drawVoronoiDiagram(LineDrawer drawer) {
         if (!this.is_Final()) {
             m_listOfReplacements.get(0).drawVoronoiDiagram(drawer);
@@ -474,15 +488,15 @@ public class DelaunyTriangle {
                 temp = neighbor.lookForTriangleWith(m_vec_b, m_vec_c);
                 if (temp != null && drawer.drawLine(mid_point, temp.getMidPointOfOuterCircle())) {
                     //If the Line has to be drawn, this Triangle has to go on with the drawing
-                    temp.drawVoronoiDiagram(drawer);
+                    temp.drawVoronoiDiagram(drawer);// TODO: Marker for Stack-Overflow
                 }
             }
 
             neighbor = m_NeighborTriangle.get(m_vec_c);
             if (neighbor!=null) {
                 temp = neighbor.lookForTriangleWith(m_vec_a, m_vec_b);
-                if (temp != null && drawer.drawLine(mid_point, temp.getMidPointOfOuterCircle())) {
-                    temp.drawVoronoiDiagram(drawer);
+                if (temp != null && drawer.drawLine(mid_point, temp.getMidPointOfOuterCircle())) {// TODO: Marker for Stack-Overflow-Start
+                    temp.drawVoronoiDiagram(drawer);// TODO: Marker for Stack-Overflow
                 }
             }
 
@@ -504,6 +518,7 @@ public class DelaunyTriangle {
             drawer.drawLine(m_vec_c, m_vec_a);
 
             drawer.drawPoint(getMidPointOfOuterCircle());
+            return;
         }
         //for (DelaunyTriangle tri: m_NeighborTriangle.values()) {
         //    if (tri != null)

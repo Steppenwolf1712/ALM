@@ -3,6 +3,7 @@ package nz.ac.auckland.alm.swing.responsive.graph.alternatives;
 import nz.ac.auckland.alm.swing.responsive.ALMPanel;
 import nz.ac.auckland.alm.swing.responsive.Algebra;
 import nz.ac.auckland.alm.swing.responsive.AlgebraFrameFactory;
+import nz.ac.auckland.alm.swing.responsive.graph.ResponsiveGUIGraph;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,17 +20,18 @@ public class AlternativeManager extends JFrame implements ActionListener {
     private static final String S_MANUAL_DESCRIPTION = "Choose an Area which shall be removed, to produce an GUI-Alternative:";
     private static final String S_BTN_REMOVE_AREA = "<html>Remove Area/<br>Create Alternative-GUI</html>";
     private final Algebra m_data;
+    private final ResponsiveGUIGraph m_respGUI_Graph;
 
-    private JSplitPane split;
     private JComboBox<AlternativeGUI> cbx_alternatives;
     private JButton btn_removeArea;
     private JLabel l_AreaInfoDescribtion;
 
     private ALMPanel m_preview = null;
 
-    public AlternativeManager(Algebra algebraData) {
+    public AlternativeManager(Algebra algebraData, ResponsiveGUIGraph respGUI_Graph) {
         super("Alternative Manager");
         m_data = algebraData;
+        m_respGUI_Graph = respGUI_Graph;
 
         init();
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -121,6 +123,12 @@ public class AlternativeManager extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(btn_removeArea)) {
             AlternativeGUI alternative = (AlternativeGUI) cbx_alternatives.getSelectedItem();
+            String altString = alternative.getAlternativeGUIString();
+
+            System.out.println("AlternativeManage: Create GUI_Definition for \n\t"+altString);
+
+            Algebra altAlgebra = new Algebra(altString);
+            m_respGUI_Graph.addUIAlgebra(altAlgebra);
         }
     }
 }

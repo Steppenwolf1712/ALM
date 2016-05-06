@@ -4,12 +4,19 @@ import nz.ac.auckland.alm.Area;
 import nz.ac.auckland.alm.HorizontalAlignment;
 import nz.ac.auckland.alm.IArea;
 import nz.ac.auckland.alm.VerticalAlignment;
+import nz.ac.auckland.alm.algebra.BottomDirection;
+import nz.ac.auckland.alm.algebra.LeftDirection;
+import nz.ac.auckland.alm.algebra.RightDirection;
+import nz.ac.auckland.alm.algebra.TopDirection;
 import nz.ac.auckland.alm.swing.ALMLayout;
 import nz.ac.auckland.alm.swing.ALMResponsiveLayout;
+import nz.ac.auckland.alm.swing.responsive.widgets.JFrameCloser;
+import nz.ac.auckland.alm.swing.responsive.widgets.JFrameResizer;
 import nz.ac.auckland.alm.swing.responsive.widgets.WidgetFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -50,9 +57,37 @@ public class AlgebraFrameFactory {
                 Area realArea = layout.areaOf(comp);
                 realArea.setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
             }
+
+            setUndecoratorForFrame(erg);
         }
 
         return erg;
+    }
+
+    private static void setUndecoratorForFrame(JFrame erg) {
+        erg.setUndecorated(true);
+        erg.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+
+        erg.getRootPane().registerKeyboardAction(new JFrameCloser(erg),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new RightDirection(), false),
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new LeftDirection(), false),
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new TopDirection(), false),
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new BottomDirection(), false),
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new RightDirection(), true),
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new LeftDirection(), true),
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new TopDirection(), true),
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        erg.getRootPane().registerKeyboardAction(new JFrameResizer(erg, new BottomDirection(), true),
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     public static ALMPanel createTestPanel(Algebra algebra) {
@@ -90,11 +125,14 @@ public class AlgebraFrameFactory {
             layout.addResponsivePart(part);
         }
 
-        erg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+//        erg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         erg.setLayout(layout);
         erg.setSize(new Dimension(500, 500));
         erg.doLayout();
 
+        setUndecoratorForFrame(erg);
+
         return erg;
     }
+
 }

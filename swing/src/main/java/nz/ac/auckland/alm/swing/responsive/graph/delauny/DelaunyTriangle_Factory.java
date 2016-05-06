@@ -31,7 +31,7 @@ public class DelaunyTriangle_Factory {
         thirdPoint = thirdPoint.add(normal);
         Vector2D[] orig_vertices = {new Vector2D(a),new Vector2D(b),thirdPoint};
         //new Vector2D(c)};//Thats not working, if the three Points are on a Line. So there has to be a third Point derived from the first two
-        Vector2D direc, middle = new Vector2D(a).add(b).add(thirdPoint);
+        Vector2D direc, middle = new Vector2D(a).add(b).add(thirdPoint);//.add(new Vector2D(5,5));
         middle = middle.mult(1.0/3);
         for (int i = 0; i<3; i++) {
             direc = orig_vertices[i].sub(middle).getNormalisation();

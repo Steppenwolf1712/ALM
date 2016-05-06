@@ -19,6 +19,7 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
 
     private static final String S_BTN_TESTALGEBRA = "Test Algebra";
     private static final String S_BTN_ADDGUI = "Create and Add";
+    private static final String S_BTN_SHOWDELAUNY = "Show Delauny";
 
     private final ResponsiveGUIGraph m_resp_Gui_Graph;
 
@@ -29,6 +30,7 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
     private JButton btn_testAlgebra;
     private JLabel l_gui_position;
     private JButton btn_addGUI;
+    private JButton btn_showDelauny;
     private JSlider sli_graphScale;
     private JButton btn_createResponsiveGUI;
 
@@ -82,7 +84,7 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
         graph_settings.add(sli_graphScale);
 
         JPanel uia_panel = new JPanel();
-        uia_panel.setLayout(new GridLayout(1,2,0,0));
+        uia_panel.setLayout(new GridLayout(1,3,0,0));
         horiLay.add(uia_panel);
         btn_testAlgebra = new JButton(S_BTN_TESTALGEBRA);
         btn_testAlgebra.addActionListener(this);
@@ -91,6 +93,10 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
         btn_addGUI = new JButton(S_BTN_ADDGUI);
         btn_addGUI.addActionListener(this);
         uia_panel.add(btn_addGUI);
+
+        btn_showDelauny = new JButton(S_BTN_SHOWDELAUNY);
+        btn_showDelauny.addActionListener(this);
+        uia_panel.add(btn_showDelauny);
 
         btn_createResponsiveGUI = new JButton("create Responsive GUI");
         btn_createResponsiveGUI.addActionListener(this);
@@ -160,6 +166,8 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
             JFrame frame = AlgebraFrameFactory.createResponsiveJFrame("ResponsiveGUI", parts, m_factory);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
+        } else if (e.getSource().equals(btn_showDelauny)) {
+            this.m_resp_Gui_Graph.switchDelaunyMode();
         }
     }
 

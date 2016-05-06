@@ -64,7 +64,7 @@ public class KontextMenu extends JPopupMenu implements ActionListener {
         } else if (e.getSource().equals(btn_addViewPoint)) {
             m_graph.addViewPoint(m_callPoint);
         } else if (e.getSource().equals(btn_alternativeManager)) {
-            AlternativeManager mgr = new AlternativeManager(((ResponsiveGUIGraph_Point)m_point).getAlgebraData());
+            AlternativeManager mgr = new AlternativeManager(((ResponsiveGUIGraph_Point)m_point).getAlgebraData(), m_graph);
             mgr.setLocationRelativeTo(null);
             mgr.setVisible(true);
             mgr.pack();

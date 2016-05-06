@@ -9,6 +9,7 @@ package nz.ac.auckland.alm.swing.test;
 
 import nz.ac.auckland.alm.*;
 import nz.ac.auckland.alm.swing.ALMLayout;
+import nz.ac.auckland.linsolve.OperatorType;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -34,6 +35,56 @@ public class SwingTests {
                     System.exit(0);
             }
         });
+    }
+
+    public void testComplexBehaviour() {
+        JDialog dialog = new JDialog();
+        addDialog(dialog);
+        dialog.setTitle("ComplexWindow");
+
+        ALMLayout alm = new ALMLayout();
+        dialog.setLayout(alm);
+
+        XTab left = alm.getLeft();
+        YTab top = alm.getTop();
+        XTab right = alm.getRight();
+        YTab bottom = alm.getBottom();
+
+        XTab x1 = new XTab();
+        XTab x2 = new XTab();
+
+        YTab y1 = new YTab();
+
+        JButton btn1 = new JButton("Topleft");
+        JButton btn2 = new JButton("TopRight");
+
+        dialog.add(btn1, new ALMLayout.LayoutParams(left, top, x1, y1));
+        dialog.add(btn2, new ALMLayout.LayoutParams(x1, top, right, y1));
+
+        JLabel lab1 = new JLabel("Input:");
+        JTextField txt1 = new JTextField();
+
+        dialog.add(lab1, new ALMLayout.LayoutParams(left, y1, x2, bottom));
+        dialog.add(txt1, new ALMLayout.LayoutParams(x2, y1, right, bottom));
+
+        alm.areaOf(btn1).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        alm.areaOf(btn2).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        alm.areaOf(txt1).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+
+        Area area = alm.areaOf(txt1);
+
+        area.setBottomInset(5);
+        area.setRightInset(5);
+        area.setTopInset(5);
+
+        LayoutSpec spec = alm.getLayoutSpec();
+        spec.addConstraint(1, x1, -0.5, right, OperatorType.EQ, 0);
+        spec.addConstraint(1, x2, OperatorType.EQ, 100);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
     }
 
     public void testThreeButtons() {
@@ -114,6 +165,10 @@ public class SwingTests {
         almLayout.areaOf(button4).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
         almLayout.areaOf(buttonMiddle).setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
 
+        LayoutSpec spec = almLayout.getLayoutSpec();
+
+        spec.addConstraint(2, y1, -1, bottom,  OperatorType.EQ, 0);
+
         dialog.setMinimumSize(almLayout.minimumLayoutSize(dialog));
         dialog.pack();
         dialog.setLocationRelativeTo(null);
@@ -181,5 +236,6 @@ public class SwingTests {
         swingTests.testThreeButtons();
         swingTests.testPinWheel();
         swingTests.testInsetsAndSpacing();
+        swingTests.testComplexBehaviour();
     }
 }

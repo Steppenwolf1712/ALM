@@ -1,5 +1,6 @@
 package nz.ac.auckland.alm.swing.responsive.graph.alternatives;
 
+import nz.ac.auckland.alm.HorizontalAlignment;
 import nz.ac.auckland.alm.IArea;
 import nz.ac.auckland.alm.algebra.*;
 
@@ -34,6 +35,12 @@ public class AreaInfo {
         IDirection direc = new LeftDirection();
         return getNeighborAreas(direc, m_area);
     }
+    public List<IArea> getOppositeLeftNeighbors() {
+        IDirection direc = new LeftDirection();
+        List<IArea> erg = getOppositeNeighborAreas(direc, m_area);
+        erg.remove(m_area);
+        return erg;
+    }
     public List<IArea> getLocalLeftNeighbors() {
         return m_leftNeighbors;
     }
@@ -41,6 +48,12 @@ public class AreaInfo {
     public List<IArea> getRightNeighbors() {
         IDirection direc = new RightDirection();
         return getNeighborAreas(direc, m_area);
+    }
+    public List<IArea> getOppositeRightNeighbors() {
+        IDirection direc = new RightDirection();
+        List<IArea> erg = getOppositeNeighborAreas(direc, m_area);
+        erg.remove(m_area);
+        return erg;
     }
     public List<IArea> getLocalRightNeighbors() {
         return m_rightNeighbors;
@@ -50,6 +63,12 @@ public class AreaInfo {
         IDirection direc = new TopDirection();
         return getNeighborAreas(direc, m_area);
     }
+    public List<IArea> getOppositeTopNeighbors() {
+        IDirection direc = new TopDirection();
+        List<IArea> erg = getOppositeNeighborAreas(direc, m_area);
+        erg.remove(m_area);
+        return erg;
+    }
     public List<IArea> getLocalTopNeighbors() {
         return m_topNeighbors;
     }
@@ -57,6 +76,12 @@ public class AreaInfo {
     public List<IArea> getBottomNeighbors() {
         IDirection direc = new BottomDirection();
         return getNeighborAreas(direc, m_area);
+    }
+    public List<IArea> getOppositeBottomNeighbors() {
+        IDirection direc = new BottomDirection();
+        List<IArea> erg = getOppositeNeighborAreas(direc, m_area);
+        erg.remove(m_area);
+        return erg;
     }
     public List<IArea> getLocalBottomNeighbors() {
         return m_botNeighbors;
@@ -66,7 +91,7 @@ public class AreaInfo {
     private ImplodeState horiState;
     private ImplodeState vertiState;
 
-    public static final String S_AREA_PLACEHOLDER = "§§§";
+    public static final String S_AREA_PLACEHOLDER = "???";
 
 
     public AreaInfo(AlgebraData data, IArea area) {
@@ -128,6 +153,10 @@ public class AreaInfo {
 
     private List<IArea> getNeighborAreas(IDirection direction, IArea area) {
         return direction.getAreas(direction.getEdge(area, direction.getTabEdgeMap(m_data)));
+    }
+
+    private List<IArea> getOppositeNeighborAreas(IDirection direc, IArea area) {
+        return direc.getOppositeAreas(direc.getEdge(area, direc.getTabEdgeMap(m_data)));
     }
 
     public boolean hasHorizontalObstacles() {
@@ -257,22 +286,22 @@ public class AreaInfo {
             if (erg.equals(ImplodeState.Horizontal_Implode_local_RightBot)) {
                 if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_TopRight))
                     return ImplodeState.Vertical_Implode_local_Top;
-                return ImplodeState.Horizontal_Implode_Right;
+                return ImplodeState.Horizontal_Implode_local_Right;
             }
             if (erg.equals(ImplodeState.Horizontal_Implode_local_RightTop)) {
                 if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_BottomRight))
-                    return ImplodeState.Vertical_Implode_Bottom;
-                return ImplodeState.Horizontal_Implode_Right;
+                    return ImplodeState.Vertical_Implode_local_Bottom;
+                return ImplodeState.Horizontal_Implode_local_Right;
             }
             if (erg.equals(ImplodeState.Horizontal_Implode_local_LeftTop)) {
                 if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_BottomLeft))
-                    return ImplodeState.Vertical_Implode_Bottom;
-                return ImplodeState.Horizontal_Implode_Left;
+                    return ImplodeState.Vertical_Implode_local_Bottom;
+                return ImplodeState.Horizontal_Implode_local_Left;
             }
             if (erg.equals(ImplodeState.Horizontal_Implode_local_LeftBot)) {
                 if (getVertiImplodeState().equals(ImplodeState.Vertical_Implode_local_TopLeft))
                     return ImplodeState.Vertical_Implode_local_Top;
-                return ImplodeState.Horizontal_Implode_Left;
+                return ImplodeState.Horizontal_Implode_local_Left;
             }
         }
         if (erg.m_compareValue == ImplodeState.Vertical_Implode_local_BottomLeft.m_compareValue) {
