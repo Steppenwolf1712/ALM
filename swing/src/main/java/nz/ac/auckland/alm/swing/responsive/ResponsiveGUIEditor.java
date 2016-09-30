@@ -3,6 +3,9 @@ package nz.ac.auckland.alm.swing.responsive;
 
 import nz.ac.auckland.alm.algebra.AlgebraData;
 import nz.ac.auckland.alm.swing.responsive.graph.ResponsiveGUIGraph;
+import nz.ac.auckland.alm.swing.responsive.layoutswitcher.DelaunySwitcher;
+import nz.ac.auckland.alm.swing.responsive.layoutswitcher.LayoutSwitcher;
+import nz.ac.auckland.alm.swing.responsive.layoutswitcher.MinSwitcher;
 import nz.ac.auckland.alm.swing.responsive.widgets.WidgetFactory;
 
 import javax.swing.*;
@@ -33,6 +36,7 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
     private JButton btn_showDelauny;
     private JSlider sli_graphScale;
     private JButton btn_createResponsiveGUI;
+    private JComboBox<LayoutSwitcher> switcher;
 
     public ResponsiveGUIEditor(String title, String initString) {
         super(title);
@@ -84,7 +88,7 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
         graph_settings.add(sli_graphScale);
 
         JPanel uia_panel = new JPanel();
-        uia_panel.setLayout(new GridLayout(1,3,0,0));
+        uia_panel.setLayout(new GridLayout(1, 3, 0, 0));
         horiLay.add(uia_panel);
         btn_testAlgebra = new JButton(S_BTN_TESTALGEBRA);
         btn_testAlgebra.addActionListener(this);
@@ -98,9 +102,17 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
         btn_showDelauny.addActionListener(this);
         uia_panel.add(btn_showDelauny);
 
+
+        JPanel creater = new JPanel(new GridLayout(1,2,0,0));
         btn_createResponsiveGUI = new JButton("create Responsive GUI");
         btn_createResponsiveGUI.addActionListener(this);
-        horiLay.add(btn_createResponsiveGUI);
+        creater.add(btn_createResponsiveGUI);
+
+        switcher = new JComboBox<LayoutSwitcher>();
+        switcher.addItem(new DelaunySwitcher());
+        switcher.addItem(new MinSwitcher());
+        creater.add(switcher);
+        horiLay.add(creater);
 
         this.getContentPane().setPreferredSize(new Dimension(m_resp_Gui_Graph.getWidth()-5, m_resp_Gui_Graph.getHeight() + 80));
     }
@@ -163,7 +175,8 @@ public class ResponsiveGUIEditor extends JFrame implements ActionListener, Mouse
                 return;
             }
 
-            JFrame frame = AlgebraFrameFactory.createResponsiveJFrame("ResponsiveGUI", parts, m_factory);
+            LayoutSwitcher temp = switcher.getItemAt(switcher.getSelectedIndex());
+            JFrame frame = AlgebraFrameFactory.createResponsiveJFrame("ResponsiveGUI", parts, m_factory, temp);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         } else if (e.getSource().equals(btn_showDelauny)) {

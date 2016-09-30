@@ -4,6 +4,7 @@ import nz.ac.auckland.alm.*;
 import nz.ac.auckland.alm.algebra.AlgebraData;
 import nz.ac.auckland.alm.swing.responsive.IResponsivePart;
 import nz.ac.auckland.alm.swing.responsive.graph.Vector2D;
+import nz.ac.auckland.alm.swing.responsive.layoutswitcher.LayoutSwitcher;
 import nz.ac.auckland.alm.swing.responsive.widgets.WidgetFactory;
 
 import javax.swing.*;
@@ -41,8 +42,11 @@ public class ALMResponsiveLayout implements LayoutManager2 {
      */
     private LayoutStyleType LayoutStyle = LayoutStyleType.FIT_TO_SIZE;
 
-    public ALMResponsiveLayout(WidgetFactory factory) {
+    private LayoutSwitcher switcher = null;
+
+    public ALMResponsiveLayout(WidgetFactory factory, LayoutSwitcher switcher) {
         m_factory = factory;
+        this.switcher = switcher;
         m_AlgebraData = new HashMap<Dimension, AlgebraData>();
         m_layouts = new HashMap<Dimension, LayoutSpec>();
     }
@@ -52,6 +56,7 @@ public class ALMResponsiveLayout implements LayoutManager2 {
         ALMLayout layout = new ALMLayout();
         AlgebraData data = part.getAlgebra().getAlgebraDataCopy(layout);
         LayoutSpec spec = layout.getLayoutSpec();
+        switcher.addPoint(prefSize);
         m_layouts.put(prefSize, spec);
         m_AlgebraData.put(prefSize, data);
 
@@ -113,7 +118,7 @@ public class ALMResponsiveLayout implements LayoutManager2 {
 
     @Override
     public Dimension minimumLayoutSize(Container parent) {
-        return new Dimension(0,0);
+        return switcher.getMinimum();
     }
 
     @Override
@@ -132,27 +137,13 @@ public class ALMResponsiveLayout implements LayoutManager2 {
     }
 
     public Dimension getSimilarPreferredSize(Dimension toCompare) {
-        Dimension erg = null;
-        double distance = Double.MAX_VALUE, tempDistance;
-        for (Map.Entry<Dimension, LayoutSpec> entry: m_layouts.entrySet()) {
-            if (erg == null) {
-                distance = new Vector2D(toCompare).distance(new Vector2D(entry.getKey()));
-                erg = entry.getKey();
-            } else {
-                tempDistance = new Vector2D(toCompare).distance(new Vector2D(entry.getKey()));
-                if (tempDistance<distance) {
-                    distance = tempDistance;
-                    erg = entry.getKey();
-                }
-            }
-        }
-        return erg;
+        return switcher.calcIdealPreferredSize(toCompare);
     }
 
 
     @Override
     public Dimension preferredLayoutSize(Container parent) {
-        Area.Size size = m_layouts.get(parent).getPreferredSize();
+        Area.Size size = m_layouts.get(parent.getPreferredSize()).getPreferredSize();
         return new Dimension((int) size.getWidth(), (int) size.getHeight());
     }
 

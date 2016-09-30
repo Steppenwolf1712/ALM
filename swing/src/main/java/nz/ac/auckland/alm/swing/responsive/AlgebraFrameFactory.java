@@ -10,6 +10,7 @@ import nz.ac.auckland.alm.algebra.RightDirection;
 import nz.ac.auckland.alm.algebra.TopDirection;
 import nz.ac.auckland.alm.swing.ALMLayout;
 import nz.ac.auckland.alm.swing.ALMResponsiveLayout;
+import nz.ac.auckland.alm.swing.responsive.layoutswitcher.LayoutSwitcher;
 import nz.ac.auckland.alm.swing.responsive.widgets.JFrameCloser;
 import nz.ac.auckland.alm.swing.responsive.widgets.JFrameResizer;
 import nz.ac.auckland.alm.swing.responsive.widgets.WidgetFactory;
@@ -117,10 +118,10 @@ public class AlgebraFrameFactory {
         return erg;
     }
 
-    public static JFrame createResponsiveJFrame(String title, IResponsivePart[] parts, WidgetFactory factory) {
+    public static JFrame createResponsiveJFrame(String title, IResponsivePart[] parts, WidgetFactory factory, LayoutSwitcher switcher) {
         JFrame erg = new JFrame(title);
 
-        ALMResponsiveLayout layout = new ALMResponsiveLayout(factory);
+        ALMResponsiveLayout layout = new ALMResponsiveLayout(factory, switcher);
         for (IResponsivePart part: parts) {
             layout.addResponsivePart(part);
         }

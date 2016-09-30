@@ -12,6 +12,7 @@ import nz.ac.auckland.alm.swing.ALMLayout;
 import nz.ac.auckland.linsolve.OperatorType;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -103,9 +104,9 @@ public class SwingTests {
         XTab x1 = new XTab();
         XTab x2 = new XTab();
 
-        JButton button1 = new JButton("Button 1");
-        JButton button2 = new JButton("Button 2");
-        JButton button3 = new JButton("Button 3");
+        JButton button1 = new JButton("A");
+        JButton button2 = new JButton("B");
+        JButton button3 = new JButton("C");
 
         dialog.add(button1, new ALMLayout.LayoutParams(left, top, x1, bottom));
         dialog.add(button2, new ALMLayout.LayoutParams(x1, top, x2, bottom));
@@ -128,6 +129,115 @@ public class SwingTests {
         almLayout.areaOf(button3).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
     }
 
+    public void testStackingThreeButtons() {
+        JDialog dialog = new JDialog();
+        addDialog(dialog);
+        dialog.setTitle("Simple Layout");
+
+        ALMLayout almLayout = new ALMLayout();
+        dialog.setLayout(almLayout);
+
+        XTab left = almLayout.getLeft();
+        YTab top = almLayout.getTop();
+        XTab right = almLayout.getRight();
+        YTab bottom = almLayout.getBottom();
+
+        XTab x1 = new XTab();
+        YTab y1 = new YTab();
+
+        JButton button1 = new JButton("A");
+        JButton button2 = new JButton("B");
+        JButton button3 = new JButton("C");
+
+        dialog.add(button1, new ALMLayout.LayoutParams(left, top, right, y1));
+        dialog.add(button2, new ALMLayout.LayoutParams(left, y1, x1, bottom));
+        dialog.add(button3, new ALMLayout.LayoutParams(x1, y1, right, bottom));
+
+        dialog.setMinimumSize(almLayout.minimumLayoutSize(dialog));
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
+        almLayout.areaOf(button1).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button2).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button3).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+    }
+
+    public void testTilingThreeButtons() {
+        JDialog dialog = new JDialog();
+        addDialog(dialog);
+        dialog.setTitle("Simple Layout");
+
+        ALMLayout almLayout = new ALMLayout();
+        dialog.setLayout(almLayout);
+
+        XTab left = almLayout.getLeft();
+        YTab top = almLayout.getTop();
+        XTab right = almLayout.getRight();
+        YTab bottom = almLayout.getBottom();
+
+        XTab x1 = new XTab();
+        YTab y1 = new YTab();
+
+        JButton button1 = new JButton("A");
+        JButton button2 = new JButton("B");
+        JButton button3 = new JButton("C");
+
+        dialog.add(button1, new ALMLayout.LayoutParams(left, top, x1, y1));
+        dialog.add(button2, new ALMLayout.LayoutParams(left, y1, x1, bottom));
+        dialog.add(button3, new ALMLayout.LayoutParams(x1, top, right, bottom));
+
+        dialog.setMinimumSize(almLayout.minimumLayoutSize(dialog));
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+
+        almLayout.areaOf(button1).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button2).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button3).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+    }
+
+    public void testTabstops() {
+        JDialog dialog = new JDialog();
+        addDialog(dialog);
+        dialog.setTitle("Referred Tabstop");
+
+        ALMLayout almLayout = new ALMLayout();
+        dialog.setLayout(almLayout);
+
+        XTab left = almLayout.getLeft();
+        YTab top = almLayout.getTop();
+        XTab right = almLayout.getRight();
+        YTab bottom = almLayout.getBottom();
+
+        XTab x1 = new XTab();
+        YTab y1 = new YTab();
+        YTab y2 = new YTab();
+
+        JButton button1 = new JButton("Button 1");
+        JButton button2 = new JButton("Button 2");
+        JButton button3 = new JButton("Button 3");
+        JButton button4 = new JButton("Button 4");
+        JButton button5 = new JButton("Button 5");
+
+        dialog.add(button1, new ALMLayout.LayoutParams(left, top, x1, y1));
+        dialog.add(button2, new ALMLayout.LayoutParams(x1, top, right, y1));
+        dialog.add(button3, new ALMLayout.LayoutParams(left, y1, right, y2));
+        dialog.add(button4, new ALMLayout.LayoutParams(left, y2, x1, bottom));
+        dialog.add(button5, new ALMLayout.LayoutParams(x1, y2, right, bottom));
+
+        almLayout.areaOf(button1).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button2).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button3).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button4).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button5).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+
+        dialog.setMinimumSize(almLayout.minimumLayoutSize(dialog));
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }
+
     public void testPinWheel() {
         JDialog dialog = new JDialog();
         addDialog(dialog);
@@ -147,11 +257,11 @@ public class SwingTests {
         YTab y1 = new YTab();
         YTab y2 = new YTab();
 
-        JButton button1 = new JButton("Button 1");
-        JButton button2 = new JButton("Button 2");
-        JButton button3 = new JButton("Button 3");
-        JButton button4 = new JButton("Button 4");
-        JButton buttonMiddle = new JButton("Middle");
+        JButton button1 = new JButton("A");
+        JButton button2 = new JButton("B");
+        JButton button3 = new JButton("C");
+        JButton button4 = new JButton("D");
+        JButton buttonMiddle = new JButton("M");
 
         dialog.add(button1, new ALMLayout.LayoutParams(left, top, x2, y1));
         dialog.add(button2, new ALMLayout.LayoutParams(x2, top, right, y2));
@@ -163,11 +273,11 @@ public class SwingTests {
         almLayout.areaOf(button2).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
         almLayout.areaOf(button3).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
         almLayout.areaOf(button4).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
-        almLayout.areaOf(buttonMiddle).setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+        almLayout.areaOf(buttonMiddle).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
 
         LayoutSpec spec = almLayout.getLayoutSpec();
 
-        spec.addConstraint(2, y1, -1, bottom,  OperatorType.EQ, 0);
+        //spec.addConstraint(2, y1, -1, bottom, OperatorType.EQ, 0);
 
         dialog.setMinimumSize(almLayout.minimumLayoutSize(dialog));
         dialog.pack();
@@ -175,11 +285,62 @@ public class SwingTests {
         dialog.setVisible(true);
 
         // test removing and re-adding
-        dialog.remove(buttonMiddle);
-        dialog.invalidate();
+        //dialog.remove(buttonMiddle);
+        //dialog.invalidate();
 
-        dialog.add(buttonMiddle, new ALMLayout.LayoutParams(x1, y1, x2, y2));
-        dialog.invalidate();
+        //dialog.add(buttonMiddle, new ALMLayout.LayoutParams(x1, y1, x2, y2));
+        //dialog.invalidate();
+    }
+
+    public void testPinWheelHole() {
+        JDialog dialog = new JDialog();
+        addDialog(dialog);
+        dialog.setTitle("PinWheelHole");
+
+        ALMLayout almLayout = new ALMLayout();
+        dialog.setLayout(almLayout);
+
+        XTab left = almLayout.getLeft();
+        YTab top = almLayout.getTop();
+        XTab right = almLayout.getRight();
+        YTab bottom = almLayout.getBottom();
+
+        XTab x1 = new XTab();
+        XTab x2 = new XTab();
+
+        YTab y1 = new YTab();
+        YTab y2 = new YTab();
+
+        JButton button1 = new JButton("A");
+        JButton button2 = new JButton("B");
+        JButton button3 = new JButton("C");
+        JButton button4 = new JButton("D");
+//        JButton buttonMiddle = new JButton("Middle");
+
+        dialog.add(button1, new ALMLayout.LayoutParams(left, top, x2, y1));
+        dialog.add(button4, new ALMLayout.LayoutParams(x2, top, right, y2));
+        dialog.add(button3, new ALMLayout.LayoutParams(x1, y2, right, bottom));
+        dialog.add(button2, new ALMLayout.LayoutParams(left, y1, x1, bottom));
+//        dialog.add(buttonMiddle, new ALMLayout.LayoutParams(x1, y1, x2, y2));
+
+        almLayout.areaOf(button1).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button2).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button3).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+        almLayout.areaOf(button4).setAlignment(HorizontalAlignment.FILL, VerticalAlignment.FILL);
+//        almLayout.areaOf(buttonMiddle).setAlignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+
+        LayoutSpec spec = almLayout.getLayoutSpec();
+
+        spec.addConstraint(1, y1, OperatorType.EQ, 60);
+        spec.addConstraint(1, x1, OperatorType.EQ, 60);
+        spec.addConstraint(1, bottom, -1, y2, OperatorType.EQ, 60);
+        spec.addConstraint(1, right, -1, x2, OperatorType.EQ, 60);
+
+        dialog.setMinimumSize(almLayout.minimumLayoutSize(dialog));
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setMinimumSize(new Dimension(10,10));
+        dialog.setVisible(true);
     }
 
     public void testInsetsAndSpacing() {
@@ -237,5 +398,9 @@ public class SwingTests {
         swingTests.testPinWheel();
         swingTests.testInsetsAndSpacing();
         swingTests.testComplexBehaviour();
+        swingTests.testStackingThreeButtons();
+        swingTests.testTilingThreeButtons();
+        swingTests.testTabstops();
+        swingTests.testPinWheelHole();
     }
 }
